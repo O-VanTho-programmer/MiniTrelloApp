@@ -5,7 +5,10 @@ import Button from "../components/ui/Button/Button"
 
 export default function AuthPage({ }) {
     const handleGoogleLogin = () => {
+        const GG_CALLBACK_URL = "http://localhost:3000/auth/google/callback";
+        const SCOPE = "openid email profile";
 
+        window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}&redirect_uri=${GG_CALLBACK_URL}&response_type=code&scope=${SCOPE}`;
     }
 
     const handleGithubLogin = () => {

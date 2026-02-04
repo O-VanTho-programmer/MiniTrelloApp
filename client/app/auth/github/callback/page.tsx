@@ -1,11 +1,11 @@
 'use client';
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { FaSpinner } from "react-icons/fa";
 
 export default function GithubCallbackPage() {
-    const searchParams = new URLSearchParams(window.location.search);
+    const searchParams = useSearchParams();
     const code = searchParams.get("code");
     const router = useRouter();
 
