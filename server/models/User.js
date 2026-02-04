@@ -9,9 +9,9 @@ class User {
   }
 
   static async createOrUpdate(data) {
-    await db.collection('users').doc(userData.id).set(userData, { merge: true });
+    await db.collection('users').doc(data.id).set(data, { merge: true });
 
-    return new User(userData.id, userData.name, userData.email, userData.avatarUrl, userData.provider);
+    return new User(data.id, data.name, data.email, data.avatarUrl, data.provider);
   }
 
 }
