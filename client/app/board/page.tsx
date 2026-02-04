@@ -1,19 +1,18 @@
 'use client';
 
+import NavSideWorkPlace from "../components/board/NavSideWorkPlace";
+
 
 export default function BoardsManagementPage() {
 
     return (
         <div className="bg-white min-h-screen w-full">
-            <div className="w-">
+            <NavSideWorkPlace/>
 
-            </div>
-
-            <div>
-                <h1>YOUR WORKSPACES</h1>
-
+            <main>
+                <h3 className="text-xl ">YOUR WORKPLACE</h3>
                 
-            </div>
+            </main>
         </div>
     );
 }

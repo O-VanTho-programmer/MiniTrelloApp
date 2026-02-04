@@ -1,6 +1,6 @@
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
-const { db } = require('../configs/db');
+const { db } = require('../config/db');
 
 exports.githubLogin = async (req, res) => {
     try {
@@ -33,15 +33,21 @@ exports.githubLogin = async (req, res) => {
             name: gitHubUser.name,
             email: gitHubUser.email,
             avatar: gitHubUser.avatar_url,
+            provider: "github"
         }
 
         const token = jwt.sign(
-            userData,
+            {
+                id: userData.id,
+                email: userData.email,
+            },
             process.env.JWT_SECRET,
             { expiresIn: "2h" }
         )
 
-        return res.status(200).json({ message: "Login successfully", token, user: userData })
+        const savedUser = await User.createOrUpdate(userData);
+
+        return res.status(200).json({ message: "Login successfully", token, user: savedUser })
 
     } catch (error) {
         console.error("Error login with GitHub", error.message);
@@ -82,15 +88,21 @@ exports.googleLogin = async (req, res) => {
             name: googleUser.name,
             email: googleUser.email,
             avatar: googleUser.picture,
+            provider: "google"
         }
 
         const token = jwt.sign(
-            userData,
+            {
+                id: userData.id,
+                email: userData.email,
+            },
             process.env.JWT_SECRET,
             { expiresIn: "2h" }
         )
 
-        return res.status(200).json({ message: "Login successfully", token, user: userData })
+        const savedUser = await User.createOrUpdate(userData);
+
+        return res.status(200).json({ message: "Login successfully", token, user: savedUser })
 
     } catch (error) {
         console.error("Error login with Google", error.message);

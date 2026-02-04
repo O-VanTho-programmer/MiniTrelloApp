@@ -20,6 +20,9 @@ io.on('connection', (socket) => {
 
 });
 
+// Middleware
+
+
 
 // API Routes
 app.use('/auth', require('./routes/auth'));
