@@ -4,7 +4,7 @@ import NavSideWorkPlace from "../components/board/NavSideWorkPlace";
 
 
 export default function BoardsManagementPage() {
-
+    
     return (
         <div className="bg-white min-h-screen w-full">
             <NavSideWorkPlace/>
