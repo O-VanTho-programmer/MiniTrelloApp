@@ -1,12 +1,13 @@
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
-const { db } = require('../config/db');
+const User = require('../models/User');
 
 exports.githubLogin = async (req, res) => {
     try {
         const { code } = req.body;
 
         const respone = await axios.post("https://github.com/login/oauth/access_token", {
+            client_id: process.env.GITHUB_CLIENT_ID,
             client_secret: process.env.GITHUB_CLIENT_SECRET,
             code
         }, {
@@ -28,11 +29,12 @@ exports.githubLogin = async (req, res) => {
         })
 
         const gitHubUser = user.data;
+
         const userData = {
-            id: gitHubUser.id,
+            id: String(gitHubUser.id),
             name: gitHubUser.name,
             email: gitHubUser.email,
-            avatar: gitHubUser.avatar_url,
+            avatar_url: gitHubUser.avatar_url,
             provider: "github"
         }
 
@@ -46,6 +48,8 @@ exports.githubLogin = async (req, res) => {
         )
 
         const savedUser = await User.createOrUpdate(userData);
+
+        console.log(savedUser);
 
         return res.status(200).json({ message: "Login successfully", token, user: savedUser })
 
@@ -84,10 +88,10 @@ exports.googleLogin = async (req, res) => {
         console.log(googleUser);
 
         const userData = {
-            id: googleUser.sub,
+            id: String(googleUser.id),
             name: googleUser.name,
             email: googleUser.email,
-            avatar: googleUser.picture,
+            avatar_url: googleUser.picture,
             provider: "google"
         }
 

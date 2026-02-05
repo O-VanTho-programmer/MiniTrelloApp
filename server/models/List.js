@@ -43,3 +43,5 @@ class List {
     return true;
   }
 }
+
+module.exports = List;

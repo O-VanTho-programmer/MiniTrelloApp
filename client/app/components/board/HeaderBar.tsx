@@ -6,7 +6,7 @@ type HeaderBarProps = {
 
 function HeaderBar({ }: HeaderBarProps) {
     return (
-        <div className="min-h-[50px] flex items-center justify-between px-4 py-2 bg-gray-700">
+        <div className="min-h-[50px] text-white flex items-center justify-between px-4 py-2 bg-gray-700">
             <span>
                 Logo
             </span>

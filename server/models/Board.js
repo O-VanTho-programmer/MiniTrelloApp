@@ -32,7 +32,7 @@ class Board {
         }
 
         const data = doc.data();
-        return new Board(data.id, data.name, data.description, data.owner_id, data.member_ids, data.create_at);
+        return new Board(doc.id, data.name, data.description, data.owner_id, data.member_ids, data.create_at);
     }
 
     static async getAll() {
@@ -40,7 +40,7 @@ class Board {
 
         return boards.docs.map(board => {
             const data = board.data();
-            return new Board(data.id, data.name, data.description, data.owner_id, data.member_ids, data.create_at);
+            return new Board(board.id, data.name, data.description, data.owner_id, data.member_ids, data.create_at);
         });
     }
 

@@ -5,7 +5,7 @@ type NavSideWorkPlaceProps = {}
 
 function NavSideWorkPlace({ }: NavSideWorkPlaceProps) {
     return (
-        <nav className='hidden sm:block'>
+        <nav className='hidden md:block shrink-0'>
             <ul className='min-w-[288px] '>
                 <li className='p-2 flex items-center gap-2 mb-1'>
                     <FaChartBar />

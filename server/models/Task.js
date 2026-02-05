@@ -1,5 +1,5 @@
 class Task {
-    constructor(id, title, description, status, card_id, order_number, owner_id, member_ids) {
+    constructor(id, title, description, status, card_id, order_number, owner_id, member_ids, create_at) {
         this.id = id;
         this.title = title;
         this.description = description || '';
@@ -8,6 +8,6 @@ class Task {
         this.order_number = order_number;
         this.owner_id = owner_id;
         this.member_ids = member_ids || [];
-        this.create_at = new Date().toISOString();
+        this.create_at = create_at;
     }
 }
