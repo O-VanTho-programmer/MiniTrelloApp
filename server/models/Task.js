@@ -41,31 +41,6 @@ class Task {
         return new Task(doc.id, data.name, data.description, data.card_id, data.board_id, data.order_number, data.owner_id, data.member_ids, data.create_at)
     }
 
-    static async getAll() {
-        const tasks = await db.collection('tasks').get();
-
-        return tasks.docs.map(task => {
-            const data = task.data();
-            return new Card(task.id, data.name, data.description, data.card_id, data.board_id, data.order_number, data.owner_id, data.member_ids, data.create_at);
-        });
-    }
-
-    static async getByUserId(userId) {
-        
-    }
-
-    static async getByBoardId(board_id) {
-        const cards = await db.collection('cards').where('board_id', '==', board_id).orderBy('order_number', 'asc').get();
-
-        return cards.docs.map(card => {
-            return new Card(card.id, card.data().name,
-                card.data().description, card.data().list_id,
-                card.data().board_id, card.data().order_number,
-                card.data().owner_id, card.data().member_ids,
-                card.data().create_at);
-        })
-    }
-
     static async update(id, data) {
         await db.collection('tasks').doc(id).update(data);
         return { id, ...data };
@@ -74,6 +49,21 @@ class Task {
     static async delete(id) {
         await db.collection('tasks').doc(id).delete();
         return true;
+    }
+
+    static async getAllByCardId(cardId) {
+        const tasks = await db.collection('tasks').where('card_id', '==', cardId).get();
+
+        return tasks.docs.map(task => {
+            const data = task.data();
+            return new Task(task.id, data.name, data.description,
+                data.card_id, data.board_id, data.order_number,
+                data.owner_id, data.member_ids, data.create_at)
+        });
+    }
+
+    static async createTaskWithInCard(data) {
+
     }
 }
 

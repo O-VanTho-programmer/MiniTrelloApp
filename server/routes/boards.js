@@ -3,6 +3,7 @@ const router = express.Router();
 const authenticateToken = require('../middleware');
 const boardController = require('../controllers/boardControllers');
 const cardController = require('../controllers/cardControllers');
+const taskController = require('../controllers/taskControllers');
 
 router.use(authenticateToken);
 
@@ -22,6 +23,17 @@ router.get('/:boardId/cards/:id', cardController.getCardById);
 router.get('/:boardId/cards/user/:user_id', cardController.getCardsByUser)
 router.put('/:boardId/cards/:id', cardController.updateCard);
 router.delete('/:boardId/cards/:id', cardController.deleteCard);//
+
+//Task
+router.get('/:boardId/cards/:id/tasks', taskController.getTasksByCard)
+router.post('/:boardId/cards/:id/tasks', taskController.createTaskWithInCard)
+router.get('/:boardId/cards/:id/tasks/:taskId', taskController.getTaskByIdWithInCard)
+router.put('/:boardId/cards/:id/tasks/:taskId', taskController.updateTaskWithInCard)
+router.delete('/:boardId/cards/:id/tasks/:taskId', taskController.deleteTaskWithInCard)
+router.post('/:boardId/cards/:id/tasks/:taskId/assign', taskController.assignMemberToTaskWithInCard)
+router.get('/:boardId/cards/:id/tasks/:taskId/assign', taskController.getAssignedMembersOfTaskWithInCard)
+router.delete('/:boardId/cards/:id/tasks/:taskId/assign/:memberId', taskController.unassignMemberToTaskWithInCard)
+
 
 
 module.exports = router;
