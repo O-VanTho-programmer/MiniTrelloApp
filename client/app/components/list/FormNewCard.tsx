@@ -6,15 +6,19 @@ type Props = {
     isOpen: boolean
     onSubmit: (name: string) => void
     onClose: () => void
+    title: string
 }
 
-function FormNewList({
+function FormNewCard({
     isOpen,
     onSubmit,
-    onClose
+    onClose,
+    title,
 }: Props) {
 
     const [nameList, setNameList] = useState<string>('');
+
+    if(!isOpen) return null;
 
     const handleAddList = () => {
         onSubmit(nameList);
@@ -34,7 +38,7 @@ function FormNewList({
             <div className="flex items-center gap-2">
                 <Button
                     onClick={handleAddList}
-                    title="Add list"
+                    title={title}
                     style="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded text-sm"
                 />
                 <button
@@ -48,4 +52,4 @@ function FormNewList({
     )
 }
 
-export default FormNewList
+export default FormNewCard

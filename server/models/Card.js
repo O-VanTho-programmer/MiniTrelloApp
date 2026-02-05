@@ -1,104 +1,86 @@
 const { db } = require("../config/db");
 
 class Card {
-    constructor(id, name, description, list_id, board_id, order_number, owner_id, member_ids, create_at) {
-        this.id = id;
-        this.name = name;
-        this.description = description || '';
-        this.list_id = list_id;
-        this.board_id = board_id;
-        this.order_number = order_number;
-        this.owner_id = owner_id;
-        this.member_ids = member_ids || [];
-        this.create_at = create_at;
+  constructor(id, name, description, board_id, order_number, create_at) {
+    this.id = id;
+    this.name = name;
+    this.description = description || '';
+    this.board_id = board_id;
+    this.order_number = order_number;
+    this.create_at = create_at;
+  }
+
+  static async create(data) {
+    const dto = {
+      name: data.name,
+      description: data.description || '',
+      board_id: data.board_id,
+      order_number: data.order_number || 0,
+      create_at: new Date().toISOString()
     }
 
-    static async create(data) {
-        const dto = {
-            name: data.name,
-            description: data.description || '',
-            list_id: data.list_id,
-            board_id: data.board_id,
-            order_number: data.order_number,
-            owner_id: data.owner_id,
-            member_ids: data.member_ids || [owner_id],
-            create_at: new Date().toISOString()
-        }
+    const card = await db.collection("cards").add(dto);
+    return new Card(card.id, dto.name, dto.description, dto.board_id, dto.order_number, dto.create_at);
+  }
 
-        const card = await db.collection('cards').add(dto);
-        return new Card(card.id, dto.name, dto.description, dto.list_id, dto.board_id, dto.order_number, dto.owner_id, dto.member_ids, dto.create_at);
+  static async getById(id) {
+    const card = await db.collection("cards").doc(id).get();
+
+    if (!card.exists) {
+      throw new Error("Card not found");
     }
 
-    static async getById(id) {
-        const doc = await db.collection('cards').doc(id).get();
+    const data = card.data();
 
-        if (!doc.exists) {
-            throw new Error('Card not found');
-        }
+    return new Card(id, data.name, data.description, data.board_id, data.order_number, data.create_at)
+  }
 
-        const data = doc.data();
+  static async getByBoardId(board_id) {
+    const cards = await db.collection("cards").where("board_id", "==", board_id).orderBy("order_number", "asc").get();
 
-        return new Card(doc.id, data.name, data.description, data.list_id, data.board_id, data.order_number, data.owner_id, data.member_ids, data.create_at)
-    }
+    return cards.docs.map((card) => {
+      const data = card.data();
+      return new Card(card.id, data.name, data.description, data.board_id, data.order_number, data.create_at);
+    })
+  }
 
-    static async getAll() {
-        const cards = await db.collection('cards').get();
+  static async getByUserId(userId) {
+    const cards = await db.collection('cards').where('member_ids', 'array-contains', userId).get();
 
-        return cards.docs.map(card => {
-            const data = card.data();
-            return new Card(card.id, data.name, data.description, data.list_id, data.board_id, data.order_number, data.owner_id, data.member_ids, data.create_at);
-        });
-    }
+    const res = await Promise.all(cards.docs.map(async card => {
+      const data = card.data();
+      const countTask = await this.getCountTask(card.id);
 
-    static async getByUserId(userId) {
-        const cards = await db.collection('cards').where('member_ids', 'array-contains', userId).get();
+      return {
+        id: card.id,
+        name: data.name,
+        description: data.description,
+        board_id: data.board_id,
+        order_number: data.order_number,
+        owner_id: data.owner_id,
+        member_ids: data.member_ids,
+        create_at: data.create_at,
+        countTask: countTask
+      }
+    }));
 
-        const res = await Promise.all(cards.docs.map(async card => {
-            const data = card.data();
-            const countTask = await this.getCountTask(card.id);
-            return {
-                id: card.id,
-                name: data.name,
-                description: data.description,
-                list_id: data.list_id,
-                board_id: data.board_id,
-                order_number: data.order_number,
-                owner_id: data.owner_id,
-                member_ids: data.member_ids,
-                create_at: data.create_at,
-                countTask: this.getCountTask(card.id)
-            }
-        }));
+    return res;
+  }
 
-        return res;
-    }
+  static async update(id, data) {
+    await db.collection("cards").doc(id).update(data);
+    return { id, ...data };
+  }
 
-    static async getByBoardId(board_id) {
-        const cards = await db.collection('cards').where('board_id', '==', board_id).orderBy('order_number', 'asc').get();
+  static async delete(id) {
+    await db.collection("cards").doc(id).delete();
+    return true;
+  }
 
-        return cards.docs.map(card => {
-            return new Card(card.id, card.data().name,
-                card.data().description, card.data().list_id,
-                card.data().board_id, card.data().order_number,
-                card.data().owner_id, card.data().member_ids,
-                card.data().create_at);
-        })
-    }
-
-    static async update(id, data) {
-        await db.collection('cards').doc(id).update(data);
-        return { id, ...data };
-    }
-
-    static async delete(id) {
-        await db.collection('cards').doc(id).delete();
-        return true;
-    }
-
-    static async getCountTask(cardId) {
-        const tasks = await db.collection('tasks').where('card_id', '==', cardId).get();
-        return tasks.size;
-    }
+  static async getCountTask(cardId) {
+    const tasks = await db.collection('tasks').where('card_id', '==', cardId).get();
+    return tasks.size;
+  }
 }
 
 module.exports = Card;

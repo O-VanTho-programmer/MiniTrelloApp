@@ -16,12 +16,12 @@ router.delete('/:id', boardController.deleteBoard);
 
 
 // Card
-router.post('/:boardId/cards', cardController.newCard);
-router.get('/:boardId/cards', cardController.getAllCards);
-router.get('/:boardId/cards/:id', cardController.getCardByBoardId);
+router.post('/:boardId/cards', cardController.newCard); //
+router.get('/:boardId/cards', cardController.getAllCards); //
+router.get('/:boardId/cards/:id', cardController.getCardById);
 router.get('/:boardId/cards/user/:user_id', cardController.getCardsByUser)
 router.put('/:boardId/cards/:id', cardController.updateCard);
-router.delete('/:boardId/cards/:id', cardController.deleteCard);
+router.delete('/:boardId/cards/:id', cardController.deleteCard);//
 
 
 module.exports = router;

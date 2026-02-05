@@ -1,6 +1,6 @@
 export interface Task{
     id: string,
-    title: string,
+    name: string,
     description?: string,
     status: string,
     card_id: string,
