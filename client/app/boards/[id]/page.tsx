@@ -59,8 +59,8 @@ function BoardPage() {
                 <main className="flex-1 overflow-x-auto overflow-y-hidden bg-white p-6">
                     <div className="flex items-start gap-6 h-full">
 
-                        {LISTS?.map((list, index) => (
-                            <ListContainer key={index} title={list.title} cards={list.cards || []} />
+                        {lists?.map((list, index) => (
+                            <ListContainer key={index} title={list.name} list_id={list.id} cards={list.cards || []} />
                         ))}
 
                         <div className="min-w-[100px] shrink-0 transition-all duration-200">
