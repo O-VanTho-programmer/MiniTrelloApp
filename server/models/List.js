@@ -23,14 +23,12 @@ class List {
 
   static async getByBoardId(board_id) {
     const lists = await db.collection("lists").where("board_id", "==", board_id).orderBy("order_number", "asc").get();
-    const listArray = [];
 
-    lists.forEach((list) => {
+    return lists.docs.map((list) => {
       const data = list.data();
-      listArray.push(new List(list.id, data.name, data.board_id, data.order_number, data.create_at));
-    });
 
-    return listArray;
+      return new List(list.id, data.name, data.board_id, data.order_number, data.create_at);
+    })
   }
 
   static async update(id, data) {

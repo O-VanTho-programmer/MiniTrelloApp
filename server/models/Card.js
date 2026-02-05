@@ -66,16 +66,28 @@ class Card {
                 owner_id: data.owner_id,
                 member_ids: data.member_ids,
                 create_at: data.create_at,
-                countTask: countTask
+                countTask: this.getCountTask(card.id)
             }
         }));
 
         return res;
     }
 
+    static async getByBoardId(board_id) {
+        const cards = await db.collection('cards').where('board_id', '==', board_id).orderBy('order_number', 'asc').get();
+
+        return cards.docs.map(card => {
+            return new Card(card.id, card.data().name,
+                card.data().description, card.data().list_id,
+                card.data().board_id, card.data().order_number,
+                card.data().owner_id, card.data().member_ids,
+                card.data().create_at);
+        })
+    }
+
     static async update(id, data) {
         await db.collection('cards').doc(id).update(data);
-        return {id, ...data};
+        return { id, ...data };
     }
 
     static async delete(id) {
@@ -83,7 +95,7 @@ class Card {
         return true;
     }
 
-    static async getCountTask(cardId){
+    static async getCountTask(cardId) {
         const tasks = await db.collection('tasks').where('card_id', '==', cardId).get();
         return tasks.size;
     }

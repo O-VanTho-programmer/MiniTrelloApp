@@ -20,14 +20,10 @@ io.on('connection', (socket) => {
 
 });
 
-// Middleware
-
-
-
 // API Routes
 app.use('/auth', require('./routes/auth'));
 app.use('/boards', require('./routes/boards'));
-// app.use('/lists', require('./routes/lists'));
+app.use('/lists', require('./routes/list'));
 // app.use('/cards', require('./routes/cards'));
 
 

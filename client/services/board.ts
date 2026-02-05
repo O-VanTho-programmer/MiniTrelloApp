@@ -26,7 +26,7 @@ export const updateBoard = async (id: string, name: string, description?: string
     return data;
 }
 
-export const deleteBoard = async (id: string): Promise<Board> => {
+export const deleteBoard = async (id: string) => {
     const {data} = await instance.delete(`/boards/${id}`)
     return data;
 }

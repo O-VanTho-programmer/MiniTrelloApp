@@ -46,8 +46,10 @@ class Board {
 
     static async getByUser(userId) {
         const boards = await db.collection('boards').where('member_ids', 'array-contains', userId).get();
+       
         return boards.docs.map(board => {
             const data = board.data();
+           
             return new Board(board.id, data.name, data.description, data.owner_id, data.member_ids, data.create_at);
         });
     }
