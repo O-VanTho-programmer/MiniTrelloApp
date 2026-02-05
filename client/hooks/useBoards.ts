@@ -1,4 +1,4 @@
-import { createBoard, getBoardById, getBoards, updateBoard } from "@/services/board"
+import { createBoard, getBoardById, getBoards, getBoardsByUser, updateBoard } from "@/services/board"
 import { BoardCreateDTO } from "@/types/Board";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
@@ -15,6 +15,13 @@ export const useGetAllBoards = () => {
     return useQuery({
         queryKey: ["boards"],
         queryFn: getBoards,
+    })
+}
+
+export const useGetBoardsByUser = () => {
+    return useQuery({
+        queryKey: ["boardsByUser"],
+        queryFn: getBoardsByUser,
     })
 }
 

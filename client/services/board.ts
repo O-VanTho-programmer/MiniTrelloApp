@@ -11,6 +11,11 @@ export const getBoardById = async (id: string): Promise<Board> => {
     return data
 }
 
+export const getBoardsByUser = async () : Promise<Board[]> => {
+    const {data} = await instance.get("/boards/user")
+    return data;
+}
+
 export const createBoard = async ({name, description} : BoardCreateDTO): Promise<Board> => {
     const {data} = await instance.post("/boards", {name, description})
     return data;

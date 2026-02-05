@@ -1,15 +1,14 @@
 'use client';
 
-import { useQuery } from "@tanstack/react-query";
 import NavSideWorkPlace from "../components/board/NavSideWorkPlace";
-import { useCreateBoard, useGetAllBoards } from "@/hooks/useBoards";
+import { useCreateBoard, useGetBoardsByUser } from "@/hooks/useBoards";
 import { useState } from "react";
 import Link from "next/link";
 import { BsPlus } from "react-icons/bs";
 import ModalNewBoard from "../components/board/ModalNewBoard";
 
 export default function BoardsManagementPage() {
-    const { data: boards, isLoading, isError, error } = useGetAllBoards();
+    const { data: boards, isLoading, isError, error } = useGetBoardsByUser();
     const createBoard = useCreateBoard();
 
     const [openModal, setOpenModal] = useState(false);

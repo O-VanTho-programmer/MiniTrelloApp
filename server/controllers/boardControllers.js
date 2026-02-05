@@ -31,6 +31,12 @@ exports.getAllBoard = async (req, res) => {
     res.status(200).json(boards);
 }
 
+exports.getBoardsByUser = async (req, res) => {
+    const userId = req.user.id;
+    const boards = await Board.getByUser(userId);
+    res.status(200).json(boards);
+}
+
 exports.updateBoard = async (req, res) => {
     const boardId = req.params.id;
     const { name, description } = req.body;

@@ -1,4 +1,5 @@
 import { FaChevronLeft, FaUserFriends } from "react-icons/fa";
+import Button from "../ui/Button/Button";
 
 const MEMBERS = [
     { id: 1, name: 'User 1', avatar: 'SD', color: 'bg-red-600' },
@@ -12,17 +13,14 @@ type SideBoardProps = {
 }
 
 
-export default function SideBoard({}: SideBoardProps) {
+export default function SideBoard({ }: SideBoardProps) {
     return (
-        <div className="w-72 bg-[#1e1e24] text-gray-300 flex flex-col h-full border-r border-gray-700">
+        <nav className="w-72 bg-[#1e1e24] text-gray-300 flex flex-col h-screen border-r border-gray-700">
             <div className="p-4 border-b border-gray-700 flex items-center justify-between">
                 <div className="flex items-center gap-2 font-semibold text-gray-100">
                     <span className="w-6 h-6 bg-pink-600 rounded text-xs flex items-center justify-center">T</span>
                     My board
                 </div>
-                <button className="text-gray-400 hover:text-white">
-                    <FaChevronLeft size={12} />
-                </button>
             </div>
 
             <div className="p-4 flex-1 overflow-y-auto">
@@ -44,13 +42,13 @@ export default function SideBoard({}: SideBoardProps) {
             </div>
 
             <div className="p-4 mt-auto">
-                <div className="mb-3 text-xs text-gray-400 leading-relaxed">
+                <p className="mb-3 text-base text-gray-400 leading-relaxed">
                     You can't find and reopen closed boards if close the board.
-                </div>
-                <button className="w-full bg-[#f87171] hover:bg-[#ef4444] text-white py-2 px-4 rounded font-medium text-sm transition-colors shadow-lg">
+                </p>
+                <button className="w-full bg-red-400 hover:bg-red-500 cursor-pointer text-white py-2 px-4 rounded font-medium text-sm shadow-lg">
                     Close Board
                 </button>
             </div>
-        </div>
+        </nav>
     );
 }
