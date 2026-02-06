@@ -3,10 +3,11 @@
 import SideBoard from '@/app/components/board/SideBoard'
 import FormNewList from '@/app/components/list/FormNewCard';
 import { useCreateCard, useGetCardsByBoardId } from '@/hooks/useCards';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { FaPlus, FaUserPlus } from 'react-icons/fa';
 import CardContainer from '@/app/components/list/CardContainer';
+import { useGetBoardById, useGetMembers, useUpdateStatusBoard } from '@/hooks/useBoards';
 
 const MEMBERS = [
     { id: 1, name: 'User 1', avatar: 'SD', color: 'bg-red-600' },
@@ -17,12 +18,16 @@ const MEMBERS = [
 
 function BoardPage() {
     const { id } = useParams();
+    const router = useRouter();
 
+    const {data: membersInBoard} = useGetMembers(id as string);
     const { data: cards, isLoading: isLoadingCards, isError: isErrorCards, error: errorCards } = useGetCardsByBoardId(id as string);
 
     const [isCreatingList, setIsCreatingList] = useState(false);
 
     const createCard = useCreateCard();
+    const updateStatusBoard = useUpdateStatusBoard();
+
 
     const handleCreateCard = (name: string) => {
         createCard.mutate({ name, board_id: id as string }, {
@@ -31,9 +36,21 @@ function BoardPage() {
             }
         })
     }
+
+    const handleCloseBoard = () => {
+        updateStatusBoard.mutate({ id: id as string, isActive: false }, {
+            onSuccess: () => {
+                alert('Board closed successfully');
+                router.push('/boards');
+            }
+        })
+    }
+
     return (
         <div className='flex'>
-            <SideBoard members={MEMBERS} />
+            <SideBoard
+                onCloseBoard={handleCloseBoard}
+                members={membersInBoard} />
             <section className='flex-1 overflow-scroll'>
                 <header className='flex justify-between items-center px-4 py-2 bg-pink-600 text-white'>
                     <h3 className=''>My Trello board</h3>
@@ -51,7 +68,7 @@ function BoardPage() {
                             <CardContainer key={index} name={card.name} card_id={card.id} />
                         ))}
 
-                        <div className="min-w-[100px] max-w-72 transition-all duration-200">
+                        <div className="min-w-[200px] max-w-72 transition-all duration-200">
                             {isCreatingList ? (
                                 <FormNewList isOpen={isCreatingList}
                                     onClose={() => setIsCreatingList(false)}

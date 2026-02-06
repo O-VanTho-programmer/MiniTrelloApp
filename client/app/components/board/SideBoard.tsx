@@ -1,19 +1,13 @@
-import { FaChevronLeft, FaUserFriends } from "react-icons/fa";
-import Button from "../ui/Button/Button";
-
-const MEMBERS = [
-    { id: 1, name: 'User 1', avatar: 'SD', color: 'bg-red-600' },
-    { id: 2, name: 'User 2', avatar: 'SD', color: 'bg-orange-600' },
-    { id: 3, name: 'User 3', avatar: 'SD', color: 'bg-yellow-600' },
-    { id: 4, name: 'User 4', avatar: 'SD', color: 'bg-red-500' },
-];
+import { User } from "@/types/User";
+import { FaUserFriends } from "react-icons/fa";
 
 type SideBoardProps = {
-    members: typeof MEMBERS;
+    members: User[] | undefined;
+    onCloseBoard: () => void;
 }
 
 
-export default function SideBoard({ }: SideBoardProps) {
+export default function SideBoard({ members = [], onCloseBoard }: SideBoardProps) {
     return (
         <nav className="w-0 sm:w-52 md:w-72 transition-all bg-[#1e1e24] text-gray-300 flex flex-col h-screen border-r border-gray-700">
             <div className="p-4 border-b border-gray-700 flex items-center justify-between">
@@ -30,11 +24,9 @@ export default function SideBoard({ }: SideBoardProps) {
                 </div>
 
                 <div className="space-y-3">
-                    {MEMBERS.map((mem) => (
+                    {members.map((mem) => (
                         <div key={mem.id} className="flex items-center gap-3 cursor-pointer hover:bg-white/10 p-2 rounded-lg transition">
-                            <div className={`w-8 h-8 rounded-full ${mem.color} flex items-center justify-center text-white text-xs font-bold`}>
-                                {mem.avatar}
-                            </div>
+                            <img className="w-8 h-8 rounded-full" src={mem.avatar_url} />
                             <span className="text-sm font-medium text-gray-200">{mem.name}</span>
                         </div>
                     ))}
@@ -45,7 +37,7 @@ export default function SideBoard({ }: SideBoardProps) {
                 <p className="mb-3 text-base text-gray-400 leading-relaxed">
                     You can't find and reopen closed boards if close the board.
                 </p>
-                <button className="w-full bg-red-400 hover:bg-red-500 cursor-pointer text-white py-2 px-4 rounded font-medium text-sm shadow-lg">
+                <button onClick={onCloseBoard} className="w-full bg-red-400 hover:bg-red-500 cursor-pointer text-white py-2 px-4 rounded font-medium text-sm shadow-lg">
                     Close Board
                 </button>
             </div>

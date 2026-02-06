@@ -3,7 +3,8 @@ export interface Board {
     name: string;
     description?: string;
     ownerId: string;       
-    memberIds: string[];   
+    memberIds: string[];
+    isActive: boolean | true;   
     createdAt: string;
 }
 

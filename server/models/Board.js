@@ -1,13 +1,14 @@
 const { db } = require("../config/db");
 
 class Board {
-    constructor(id, name, description, owner_id, member_ids, create_at) {
+    constructor(id, name, description, owner_id, member_ids, create_at, is_active) {
         this.id = id;
         this.name = name;
         this.description = description || '';
         this.owner_id = owner_id;
         this.member_ids = member_ids || [];
         this.create_at = create_at;
+        this.is_active = is_active || true;
     }
 
     static async create(data) {
@@ -36,7 +37,7 @@ class Board {
     }
 
     static async getAll() {
-        const boards = await db.collection('boards').get();
+        const boards = await db.collection('boards').where('is_active', '==', true).get();
 
         return boards.docs.map(board => {
             const data = board.data();
@@ -45,13 +46,23 @@ class Board {
     }
 
     static async getByUser(userId) {
-        const boards = await db.collection('boards').where('member_ids', 'array-contains', userId).get();
+        const boards = await db.collection('boards').where('member_ids', 'array-contains', userId).where('is_active', '!=', false).get();
        
         return boards.docs.map(board => {
             const data = board.data();
            
             return new Board(board.id, data.name, data.description, data.owner_id, data.member_ids, data.create_at);
         });
+    }
+
+    static async getMembers(boardId) {
+        const board = await db.collection('boards').doc(boardId).get();
+
+        if (!board.exists) {
+            throw new Error('Board not found');
+        }
+
+        return board.data().member_ids;
     }
 
 

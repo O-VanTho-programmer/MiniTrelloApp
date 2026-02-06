@@ -1,4 +1,5 @@
 const Board = require('../models/Board');
+const User = require('../models/User');
 
 exports.newBoard = async (req, res) => {
     try {
@@ -37,10 +38,28 @@ exports.getBoardsByUser = async (req, res) => {
     res.status(200).json(boards);
 }
 
+exports.getMembers = async (req, res) => {
+    const boardId = req.params.id;
+    const board = await Board.getById(boardId);
+
+    const members = await User.getByIds(board.member_ids);
+
+    res.status(200).json(members);
+}
+
 exports.updateBoard = async (req, res) => {
     const boardId = req.params.id;
-    const { name, description } = req.body;
-    const board = await Board.update(boardId, { name, description });
+    const { name, description, is_active } = req.body;
+
+    const updatedBoard = {};
+
+    if (typeof name === "string" && name.trim().length > 0) updatedBoard.name = name;
+    if (typeof description === 'string') updatedBoard.description = description;
+    if (typeof is_active === 'boolean') updatedBoard.is_active = is_active;
+
+    console.log(updatedBoard);
+
+    const board = await Board.update(boardId, updatedBoard);
     res.status(200).json(board);
 }
 

@@ -20,7 +20,7 @@ function Button({
     const Icon = icon || null
 
     return (
-        <button className={`${style || ''} cursor-pointer py-2 px-4 rounded-sm flex justify-between items-center gap-2`} onClick={onClick}>
+        <button type="button" className={`${style || ''} cursor-pointer py-2 px-4 rounded-sm flex justify-between items-center gap-2`} onClick={onClick}>
             {Icon && <Icon size={iconSize} />}
             <span>{title}</span>
         </button>

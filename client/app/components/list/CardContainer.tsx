@@ -4,8 +4,10 @@ import FormNewList from './FormNewCard'
 import { BiMenu } from 'react-icons/bi'
 import { useDeleteCard } from '@/hooks/useCards'
 import { useParams } from 'next/navigation'
-import { useCreateTaskWithInCard, useGetTasksByCardId } from '@/hooks/useTasks'
+import { useCreateTaskWithInCard, useDeleteTask, useGetTasksByCardId } from '@/hooks/useTasks'
 import TaskItem from '../task/TaskItem'
+import { TaskWithAssignedMember } from '@/types/Task'
+import TaskDetailModal from '../task/TaskDetailModal'
 
 type CardContainerProps = {
     name: string
@@ -20,9 +22,11 @@ function CardContainer({ name, card_id }: CardContainerProps) {
 
     const [isCreatingTask, setIsCreatingTask] = useState(false);
     const [openSetting, setOpenSetting] = useState(false);
+    const [selectedTask, setSelectedTask] = useState<TaskWithAssignedMember | null>(null);
 
     const deleteCardById = useDeleteCard();
     const createTask = useCreateTaskWithInCard();
+    const deleteTask = useDeleteTask();
 
     const handleCreateTask = (name: string, description: string) => {
         createTask.mutate({ name, description, card_id, board_id: id as string }, {
@@ -31,6 +35,16 @@ function CardContainer({ name, card_id }: CardContainerProps) {
             }
         })
     }
+
+    const handleDeleteTask = (id: string) => {
+        deleteTask.mutate({ id, board_id: id as string, card_id }, {
+            onSuccess: () => {
+                alert('Task deleted successfully');
+            }
+        })
+    }
+
+
 
     const handleDeleteCard = () => {
         deleteCardById.mutate({ id: card_id, board_id: id as string }, {
@@ -41,7 +55,7 @@ function CardContainer({ name, card_id }: CardContainerProps) {
     }
 
     return (
-        <div className="min-w-[100px] max-w-72 flex-1 shrink-0">
+        <div className="min-w-[250px] max-w-72 flex-1 shrink-0">
             <div className="bg-gray-800 rounded-xl p-3 shadow-sm">
 
                 <div className='flex items-center justify-between mb-2'>
@@ -68,7 +82,9 @@ function CardContainer({ name, card_id }: CardContainerProps) {
 
                 <div className="max-h-[70vh] overflow-y-auto flex flex-col gap-2">
                     {tasks?.map((task, idx) => (
-                        <TaskItem key={idx} item={task} />
+                        <div onClick={() => setSelectedTask(task)} key={idx} className='cursor-pointer'>
+                            <TaskItem key={idx} item={task} />
+                        </div>
                     ))}
                 </div>
 
@@ -91,6 +107,15 @@ function CardContainer({ name, card_id }: CardContainerProps) {
                 </div>
 
             </div>
+
+            {selectedTask && (
+                <TaskDetailModal
+                    task={selectedTask}
+                    isOpen={selectedTask !== null}
+                    onDelete={() => handleDeleteTask(selectedTask.id)}
+                    onClose={() => setSelectedTask(null)}
+                />
+            )}
         </div>
     )
 }

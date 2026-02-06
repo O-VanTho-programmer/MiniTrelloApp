@@ -3,7 +3,7 @@ const Card = require("../models/Card");
 exports.newCard = async (req, res) => {
     try {
         const { name, description } = req.body;
-        const board_id  = req.params.boardId;
+        const board_id = req.params.boardId;
         const userId = req.user.id;
 
         const cardLength = (await Card.getByBoardId(board_id)).length;

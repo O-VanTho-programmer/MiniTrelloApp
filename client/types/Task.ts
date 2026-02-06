@@ -1,4 +1,6 @@
-export interface Task{
+import { User } from "./User"
+
+export interface Task {
     id: string,
     name: string,
     description?: string,
@@ -11,6 +13,6 @@ export interface Task{
 }
 
 
-export interface TaskWithAssignedMember extends Task{
-    member_id?: string[] | []
+export interface TaskWithAssignedMember extends Task {
+    members?: User[] | []
 }

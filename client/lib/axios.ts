@@ -2,7 +2,7 @@ import axios from "axios";
 
 const instance = axios.create({
     baseURL: `${process.env.NEXT_PUBLIC_SERVER_URL}`,
-    timeout: 1000,
+    timeout: 10000,
     headers: { 'Content-Type': 'application/json' }
 });
 
@@ -10,6 +10,7 @@ instance.interceptors.request.use(function (config) {
     if (typeof window !== 'undefined') {
         const token = localStorage.getItem('token');
         if (token) {
+            console.log(token);
             config.headers.Authorization = `Bearer ${token}`;
         }
     }
@@ -26,11 +27,12 @@ instance.interceptors.response.use(function onFulfilled(response) {
 }, function onRejected(error) {
     // Any status codes that falls outside the range of 2xx cause this function to trigger
     // Do something with response error
-
-    if (error.response.status === 401 || error.response.status === 403){
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.href = '/auth';
+    if (error.response) {
+        if (error.response.status === 401 || error.response.status === 403) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/auth';
+        }
     }
     return Promise.reject(error);
 });

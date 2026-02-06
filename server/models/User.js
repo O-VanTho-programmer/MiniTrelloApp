@@ -13,6 +13,14 @@ class User {
 
     return new User(data.id, data.name, data.email, data.avatar_url, data.provider);
   }
-}
 
+  static async getByIds(ids) {
+    const users = await db.collection("users").where("id", "in", ids).get();
+
+    return users.docs.map(user => {
+      const data = user.data();
+      return new User(user.id, data.name, data.email, data.avatar_url, data.provider);
+    });
+  }
+}
 module.exports = User;
