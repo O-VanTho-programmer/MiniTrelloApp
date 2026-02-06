@@ -10,12 +10,15 @@ class Card {
     this.create_at = create_at;
   }
 
-  static async create(data) {
+  static async create(name, description, board_id) {
+    
+    const maxOrderNumber = (await db.collection('cards').where('board_id', '==', board_id).orderBy('order_number', 'desc').limit(1).get()).docs[0].data().order_number;
+
     const dto = {
-      name: data.name,
-      description: data.description || '',
-      board_id: data.board_id,
-      order_number: data.order_number || 0,
+      name: name,
+      description: description || '',
+      board_id: board_id,
+      order_number: maxOrderNumber + 1 || 0,
       create_at: new Date().toISOString()
     }
 

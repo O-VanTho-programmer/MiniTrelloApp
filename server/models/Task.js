@@ -14,22 +14,6 @@ class Task {
         this.create_at = create_at;
     }
 
-    static async create(data) {
-        const dto = {
-            name: data.name,
-            description: data.description || '',
-            card_id: data.card_id,
-            board_id: data.board_id,
-            order_number: data.order_number,
-            owner_id: data.owner_id,
-            member_ids: data.member_ids,
-            create_at: new Date().toISOString()
-        }
-
-        const task = await db.collection('tasks').add(dto);
-        return new Task(task.id, dto.name, dto.description, dto.card_id, dto.board_id, dto.order_number, dto.owner_id, dto.member_ids, dto.create_at);
-    }
-
     static async getById(id) {
         const doc = await db.collection('tasks').doc(id).get();
 
@@ -53,7 +37,7 @@ class Task {
     }
 
     static async getAllByCardId(cardId) {
-        const tasks = await db.collection('tasks').where('card_id', '==', cardId).get();
+        const tasks = await db.collection('tasks').where('card_id', '==', cardId).orderBy('order_number', 'asc').get();
 
         return tasks.docs.map(task => {
             const data = task.data();
@@ -64,7 +48,7 @@ class Task {
     }
 
     static async createWithInCard(cardId, boardId, ownerId, name, description) {
-        const curOrderNumber = (await db.collection('tasks').where('card_id', '==', cardId).count().get()).data().count;
+        const maxOrderNumber = (await db.collection('tasks').where('card_id', '==', cardId).orderBy('order_number', 'desc').limit(1).get()).docs[0].data().order_number;
 
         const dto = {
             name: name,
@@ -72,7 +56,7 @@ class Task {
             status: 'Pending',
             card_id: cardId,
             board_id: boardId,
-            order_number: curOrderNumber.count + 1,
+            order_number: maxOrderNumber + 1,
             owner_id: ownerId,
             member_ids: [],
             create_at: new Date().toISOString()

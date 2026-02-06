@@ -4,5 +4,8 @@ const authController = require('../controllers/authControllers');
 
 router.post('/github', authController.githubLogin);
 router.post('/google', authController.googleLogin);
+router.post('/send-code', authController.sendCode);
+router.post('/signup', authController.signUp);
+router.post('/signin', authController.signIn);
 
 module.exports = router;

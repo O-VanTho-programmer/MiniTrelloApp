@@ -1,6 +1,17 @@
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const nodemailer = require('nodemailer');
+const AuthCode = require('../models/AuthCode');
+
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+})
+
 
 exports.githubLogin = async (req, res) => {
     try {
@@ -111,5 +122,104 @@ exports.googleLogin = async (req, res) => {
     } catch (error) {
         console.error("Error login with Google", error.message);
         res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+
+exports.sendCode = async (req, res) => {
+    const { email } = req.body;
+
+    const existUser = await User.getByEmail(email);
+
+    if (existUser) {
+        res.status(400).json({ error: "User already exists" });
+        return;
+    }
+
+    const code = Math.floor(Math.random() * 90000) + 10000;;
+
+    await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: "Verify Email",
+        text: `Your verification code is: ${code}`
+    })
+
+    const newAuthCode = await AuthCode.create(email, code);
+    res.status(201).json(newAuthCode);
+}
+
+exports.signUp = async (req, res) => {
+    try {
+        const { name, email, code } = req.body;
+
+        const authCode = await AuthCode.verify(email, Number(code));
+
+        if (!authCode) {
+            return res.status(400).json({ error: "Invalid code" });
+        }
+
+        const newUser = await User.create(name, email);
+
+        const userData = {
+            id: newUser.id,
+            name: newUser.name,
+            email: newUser.email,
+            avatar_url: newUser.avatar_url,
+            provider: newUser.provider
+        }
+
+        const token = jwt.sign(
+            {
+                id: userData.id,
+                email: userData.email,
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: "2h" }
+        )
+
+        res.status(201).json({ message: "Sign up successfully", token, user: newUser });
+    } catch (error) {
+        console.error("Error sign up", error.message);
+        res.status(500).json({ error: "Error sign up" });
+    }
+}
+
+exports.signIn = async (req, res) => {
+    try {
+        const { email, code } = req.body;
+
+        const authCode = await AuthCode.verify(email, Number(code));
+
+        if (!authCode) {
+            return res.status(400).json({ error: "Invalid code" });
+        }
+
+        const user = await User.getByEmail(email);
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const userData = {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            avatar_url: user.avatar_url,
+            provider: user.provider
+        }
+
+        const token = jwt.sign(
+            {
+                id: userData.id,
+                email: userData.email,
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: "2h" }
+        )
+
+        res.status(200).json({ message: "Sign in successfully", token, user: userData });
+    } catch (error) {
+        console.error("Error sign in", error.message);
+        res.status(500).json({ error: "Error sign in" });
     }
 }

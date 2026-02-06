@@ -4,18 +4,9 @@ exports.newCard = async (req, res) => {
     try {
         const { name, description } = req.body;
         const board_id = req.params.boardId;
-        const userId = req.user.id;
 
-        const cardLength = (await Card.getByBoardId(board_id)).length;
 
-        const newCard = await Card.create({
-            name,
-            description,
-            board_id,
-            owner_id: userId,
-            order_number: cardLength + 1,
-            member_ids: [userId]
-        });
+        const newCard = await Card.create(name, description, board_id);
 
         res.status(201).json(newCard);
     } catch (error) {
