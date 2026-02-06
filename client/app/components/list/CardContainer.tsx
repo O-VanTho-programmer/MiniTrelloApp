@@ -1,32 +1,39 @@
-import CardItem from '../task/TaskItem'
 import { FaPlus, FaTimes } from 'react-icons/fa'
 import { useState } from 'react'
 import FormNewList from './FormNewCard'
-import { Task } from '@/types/Task'
 import { BiMenu } from 'react-icons/bi'
 import { useDeleteCard } from '@/hooks/useCards'
 import { useParams } from 'next/navigation'
+import { useCreateTaskWithInCard, useGetTasksByCardId } from '@/hooks/useTasks'
+import TaskItem from '../task/TaskItem'
 
 type CardContainerProps = {
     name: string
     card_id: string
-    tasks: Task[]
 }
 
-function CardContainer({ name, card_id, tasks }: CardContainerProps) {
-    const {board_id} = useParams();
+function CardContainer({ name, card_id }: CardContainerProps) {
+    const { id } = useParams();
+
+    const { data: tasks } = useGetTasksByCardId(card_id, id as string);
+
 
     const [isCreatingTask, setIsCreatingTask] = useState(false);
     const [openSetting, setOpenSetting] = useState(false);
 
     const deleteCardById = useDeleteCard();
+    const createTask = useCreateTaskWithInCard();
 
-    const handleCreateTask = (title: string) => {
-
+    const handleCreateTask = (name: string, description: string) => {
+        createTask.mutate({ name, description, card_id, board_id: id as string }, {
+            onSuccess: () => {
+                alert('Task created successfully');
+            }
+        })
     }
 
     const handleDeleteCard = () => {
-        deleteCardById.mutate({ id: card_id, board_id: board_id as string }, {
+        deleteCardById.mutate({ id: card_id, board_id: id as string }, {
             onSuccess: () => {
                 alert('Card deleted successfully');
             }
@@ -34,7 +41,7 @@ function CardContainer({ name, card_id, tasks }: CardContainerProps) {
     }
 
     return (
-        <div className="min-w-[100px] flex-1 shrink-0">
+        <div className="min-w-[100px] max-w-72 flex-1 shrink-0">
             <div className="bg-gray-800 rounded-xl p-3 shadow-sm">
 
                 <div className='flex items-center justify-between mb-2'>
@@ -59,9 +66,9 @@ function CardContainer({ name, card_id, tasks }: CardContainerProps) {
                     </div>
                 </div>
 
-                <div className="max-h-[70vh] overflow-y-auto">
-                    {tasks.map((task, idx) => (
-                        <CardItem key={idx} item={task} />
+                <div className="max-h-[70vh] overflow-y-auto flex flex-col gap-2">
+                    {tasks?.map((task, idx) => (
+                        <TaskItem key={idx} item={task} />
                     ))}
                 </div>
 
@@ -78,7 +85,7 @@ function CardContainer({ name, card_id, tasks }: CardContainerProps) {
                             className="w-full flex items-center gap-2 text-gray-400 hover:text-gray-100 hover:bg-gray-700 py-2 px-2 rounded-lg text-sm mt-1 cursor-pointer"
                         >
                             <FaPlus size={12} />
-                            Add a card
+                            Add a task
                         </button>
                     )}
                 </div>

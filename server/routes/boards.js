@@ -25,11 +25,11 @@ router.put('/:boardId/cards/:id', cardController.updateCard);
 router.delete('/:boardId/cards/:id', cardController.deleteCard);//
 
 //Task
-router.get('/:boardId/cards/:id/tasks', taskController.getTasksByCard)
-router.post('/:boardId/cards/:id/tasks', taskController.createTaskWithInCard)
-router.get('/:boardId/cards/:id/tasks/:taskId', taskController.getTaskByIdWithInCard)
-router.put('/:boardId/cards/:id/tasks/:taskId', taskController.updateTaskWithInCard)
-router.delete('/:boardId/cards/:id/tasks/:taskId', taskController.deleteTaskWithInCard)
+router.get('/:boardId/cards/:id/tasks', taskController.getTasksByCard)//
+router.post('/:boardId/cards/:id/tasks', taskController.createTaskWithInCard)//
+router.get('/:boardId/cards/:id/tasks/:taskId', taskController.getTaskByIdWithInCard)//
+router.put('/:boardId/cards/:id/tasks/:taskId', taskController.updateTaskWithInCard)//
+router.delete('/:boardId/cards/:id/tasks/:taskId', taskController.deleteTaskWithInCard)//
 router.post('/:boardId/cards/:id/tasks/:taskId/assign', taskController.assignMemberToTaskWithInCard)
 router.get('/:boardId/cards/:id/tasks/:taskId/assign', taskController.getAssignedMembersOfTaskWithInCard)
 router.delete('/:boardId/cards/:id/tasks/:taskId/assign/:memberId', taskController.unassignMemberToTaskWithInCard)

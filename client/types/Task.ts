@@ -9,3 +9,8 @@ export interface Task{
     member_ids: string[],
     create_at: string
 }
+
+
+export interface TaskWithAssignedMember extends Task{
+    member_id?: string[] | []
+}

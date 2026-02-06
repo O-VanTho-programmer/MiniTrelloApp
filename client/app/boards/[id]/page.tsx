@@ -2,7 +2,6 @@
 
 import SideBoard from '@/app/components/board/SideBoard'
 import FormNewList from '@/app/components/list/FormNewCard';
-import { useGetBoardById } from '@/hooks/useBoards';
 import { useCreateCard, useGetCardsByBoardId } from '@/hooks/useCards';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
@@ -18,10 +17,8 @@ const MEMBERS = [
 
 function BoardPage() {
     const { id } = useParams();
-    
-    const { data: cards, isLoading: isLoadingCards, isError: isErrorCards, error: errorCards } = useGetCardsByBoardId(id as string);
 
-    console.log(cards);
+    const { data: cards, isLoading: isLoadingCards, isError: isErrorCards, error: errorCards } = useGetCardsByBoardId(id as string);
 
     const [isCreatingList, setIsCreatingList] = useState(false);
 
@@ -51,15 +48,15 @@ function BoardPage() {
                     <div className="flex items-start gap-6 h-full">
 
                         {cards?.map((card, index) => (
-                            <CardContainer key={index} name={card.name} card_id={card.id} tasks={card.tasks || []} />
+                            <CardContainer key={index} name={card.name} card_id={card.id} />
                         ))}
 
-                        <div className="min-w-[100px] shrink-0 transition-all duration-200">
+                        <div className="min-w-[100px] max-w-72 transition-all duration-200">
                             {isCreatingList ? (
                                 <FormNewList isOpen={isCreatingList}
                                     onClose={() => setIsCreatingList(false)}
-                                    onSubmit={handleCreateCard} 
-                                    title='Add Card'/>
+                                    onSubmit={handleCreateCard}
+                                    title='Add Card' />
                             ) : (
                                 <button
                                     onClick={() => setIsCreatingList(true)}
@@ -67,7 +64,7 @@ function BoardPage() {
                                     className="w-full cursor-pointer flex items-center gap-2 bg-pink-600 hover:bg-pink-700 text-white px-4 py-3 rounded-xl shadow-md transition font-medium text-sm text-left"
                                 >
                                     {!createCard.isPending && <FaPlus />}
-                                    {createCard.isPending ? "Creating..." : "Add a list"}
+                                    {createCard.isPending ? "Creating..." : "Add a card"}
                                 </button>
                             )}
                         </div>

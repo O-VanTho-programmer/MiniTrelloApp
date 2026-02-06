@@ -1,10 +1,11 @@
 const { db } = require("../config/db");
 const { FieldValue } = require("firebase-admin/firestore");
 class Task {
-    constructor(id, name, description, card_id, board_id, order_number, owner_id, member_ids, create_at) {
+    constructor(id, name, description, status, card_id, board_id, order_number, owner_id, member_ids, create_at) {
         this.id = id;
         this.name = name;
         this.description = description || '';
+        this.status = status || 'Pending';
         this.card_id = card_id;
         this.board_id = board_id;
         this.order_number = order_number;
@@ -38,7 +39,7 @@ class Task {
 
         const data = doc.data();
 
-        return new Task(doc.id, data.name, data.description, data.card_id, data.board_id, data.order_number, data.owner_id, data.member_ids, data.create_at)
+        return new Task(doc.id, data.name, data.description, data.status, data.card_id, data.board_id, data.order_number, data.owner_id, data.member_ids, data.create_at)
     }
 
     static async update(id, data) {
@@ -57,7 +58,7 @@ class Task {
         return tasks.docs.map(task => {
             const data = task.data();
             return new Task(task.id, data.name, data.description,
-                data.card_id, data.board_id, data.order_number,
+                data.status, data.card_id, data.board_id, data.order_number,
                 data.owner_id, data.member_ids, data.create_at)
         });
     }
@@ -68,6 +69,7 @@ class Task {
         const dto = {
             name: name,
             description: description || '',
+            status: 'Pending',
             card_id: cardId,
             board_id: boardId,
             order_number: curOrderNumber.count + 1,
@@ -89,7 +91,7 @@ class Task {
 
         const data = task.data();
 
-        return new Task(task.id, data.name, data.description, data.card_id, data.board_id, data.order_number, data.owner_id, data.member_ids, data.create_at);
+        return new Task(task.id, data.name, data.description, data.status, data.card_id, data.board_id, data.order_number, data.owner_id, data.member_ids, data.create_at);
     }
 
     static async updateWithInCard(taskId, data) {

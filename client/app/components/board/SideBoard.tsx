@@ -15,7 +15,7 @@ type SideBoardProps = {
 
 export default function SideBoard({ }: SideBoardProps) {
     return (
-        <nav className="w-72 bg-[#1e1e24] text-gray-300 flex flex-col h-screen border-r border-gray-700">
+        <nav className="w-0 sm:w-52 md:w-72 transition-all bg-[#1e1e24] text-gray-300 flex flex-col h-screen border-r border-gray-700">
             <div className="p-4 border-b border-gray-700 flex items-center justify-between">
                 <div className="flex items-center gap-2 font-semibold text-gray-100">
                     <span className="w-6 h-6 bg-pink-600 rounded text-xs flex items-center justify-center">T</span>

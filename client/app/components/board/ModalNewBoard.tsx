@@ -25,7 +25,7 @@ function ModalNewBoard({ isOpen, onClose, onSubmit }: ModalNewBoardProps) {
             <div className='modal-content'>
                 <h3 className='mb-5 text-lg'>Create new board</h3>
 
-                <form className="space-y-4">
+                <div className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Board Name
@@ -67,7 +67,7 @@ function ModalNewBoard({ isOpen, onClose, onSubmit }: ModalNewBoardProps) {
                             title="Create Board"
                         />
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     )

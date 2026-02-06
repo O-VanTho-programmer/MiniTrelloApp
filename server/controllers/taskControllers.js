@@ -3,7 +3,7 @@ const Task = require("../models/Task");
 exports.getTasksByCard = async (req, res) => {
     try {
         const cardId = req.params.id;
-        const tasks = await Task.getByCardId(cardId);
+        const tasks = await Task.getAllByCardId(cardId);
         res.status(200).json(tasks);
     } catch (error) {
         console.error("Error get tasks by card", error);
