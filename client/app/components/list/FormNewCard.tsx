@@ -4,7 +4,7 @@ import Button from '../ui/Button/Button';
 
 type Props = {
     isOpen: boolean
-    onSubmit: (name: string) => void
+    onSubmit: (name: string, description: string) => void
     onClose: () => void
     title: string
 }
@@ -16,12 +16,13 @@ function FormNewCard({
     title,
 }: Props) {
 
-    const [nameList, setNameList] = useState<string>('');
+    const [name, setName] = useState<string>('');
+    const [description, setDescription] = useState<string>('');
 
-    if(!isOpen) return null;
+    if (!isOpen) return null;
 
     const handleAddList = () => {
-        onSubmit(nameList);
+        onSubmit(name, description);
     }
 
     return (
@@ -29,10 +30,17 @@ function FormNewCard({
             <input
                 autoFocus
                 type="text"
-                placeholder="Enter list title..."
+                placeholder="Enter name"
                 className="w-full px-3 py-2 rounded-lg bg-gray-800 border-2 border-gray-500 text-white text-sm focus:outline-none mb-3 placeholder-gray-500"
-                value={nameList}
-                onChange={(e) => setNameList(e.target.value)}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+            />
+
+            <textarea
+                placeholder="Enter description (optional)"
+                className="w-full px-3 py-2 rounded-lg bg-gray-800 border-2 border-gray-500 text-white text-sm focus:outline-none mb-3 placeholder-gray-500"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
             />
 
             <div className="flex items-center gap-2">

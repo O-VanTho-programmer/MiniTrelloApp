@@ -2,19 +2,12 @@
 
 import SideBoard from '@/app/components/board/SideBoard'
 import FormNewList from '@/app/components/list/FormNewCard';
-import ListContainer from '@/app/components/list/CardContainer';
 import { useGetBoardById } from '@/hooks/useBoards';
 import { useCreateCard, useGetCardsByBoardId } from '@/hooks/useCards';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { FaPlus, FaUserPlus } from 'react-icons/fa';
 import CardContainer from '@/app/components/list/CardContainer';
-
-const cards = [
-    { title: 'To do', cards: [] },
-    { title: 'Doing', cards: [] },
-    { title: 'Done', cards: [] },
-];
 
 const MEMBERS = [
     { id: 1, name: 'User 1', avatar: 'SD', color: 'bg-red-600' },
@@ -25,8 +18,7 @@ const MEMBERS = [
 
 function BoardPage() {
     const { id } = useParams();
-
-    const { data: board, isLoading, isError, error } = useGetBoardById(id as string);
+    
     const { data: cards, isLoading: isLoadingCards, isError: isErrorCards, error: errorCards } = useGetCardsByBoardId(id as string);
 
     console.log(cards);
