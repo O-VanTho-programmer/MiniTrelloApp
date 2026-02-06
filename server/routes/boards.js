@@ -13,6 +13,7 @@ router.post('/', boardController.newBoard);
 router.get('/user', boardController.getBoardsByUser);
 router.get('/:id', boardController.getBoard);
 router.get('/:id/members', boardController.getMembers);
+router.post('/:id/members', boardController.addMemberToBoard)
 router.put('/:id', boardController.updateBoard);
 router.delete('/:id', boardController.deleteBoard);
 

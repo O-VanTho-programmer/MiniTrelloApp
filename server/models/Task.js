@@ -121,18 +121,13 @@ class Task {
             throw new Error('Task not found');
         }
 
-        return {
-            taskId: task.id,
-            memberId: task.data().member_ids
-        };
+        return task.data().member_ids;
     }
 
     static async unassignMember(taskId, memberId) {
         const task = await db.collection("tasks").doc(taskId).set({
             member_ids: FieldValue.arrayRemove(memberId)
-        }, {
-            merge: true
-        });
+        }, { merge: true });
 
         return true;
     }

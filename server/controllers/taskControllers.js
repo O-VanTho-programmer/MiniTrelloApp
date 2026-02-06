@@ -1,4 +1,5 @@
 const Task = require("../models/Task");
+const User = require("../models/User");
 
 exports.getTasksByCard = async (req, res) => {
     try {
@@ -58,7 +59,7 @@ exports.deleteTaskWithInCard = async (req, res) => {
 
         await Task.deleteWithInCard(taskId);
 
-        res.status(204);
+        res.status(204).json();
     } catch (error) {
         console.error("Error delete task with in card", error);
         res.status(500).json({ error: "Error delete task with in card" });
@@ -86,7 +87,7 @@ exports.unassignMemberToTaskWithInCard = async (req, res) => {
 
         const task = await Task.unassignMember(taskId, memberId);
 
-        res.status(204);
+        res.status(204).json();
     } catch (error) {
         console.error("Error unassign member to task with in card", error);
         res.status(500).json({ error: "Error unassign member to task" });
@@ -97,10 +98,15 @@ exports.unassignMemberToTaskWithInCard = async (req, res) => {
 exports.getAssignedMembersOfTaskWithInCard = async (req, res) => {
     try {
         const taskId = req.params.taskId;
-        const assignedMembers = await Task.getAssignedMembers(taskId);
+        const assignedMemberIds = await Task.getAssignedMembers(taskId);
 
-        res.status(200).json(assignedMembers);
-    } catch (error) {
+        const members = await User.getByIds(assignedMemberIds);
+
+        res.status(200).json({
+            task_id: taskId,
+            members
+        });
+    } catch (error) {   
         console.error("Error get assigned members", error);
         res.status(500).json({ error: "Error" });
     }

@@ -28,7 +28,6 @@ io.on('connection', (socket) => {
 // API Routes
 app.use('/auth', require('./routes/auth'));
 app.use('/boards', require('./routes/boards'));
-// app.use('/cards', require('./routes/cards'));
 
 
 

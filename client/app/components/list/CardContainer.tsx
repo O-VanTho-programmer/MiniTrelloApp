@@ -29,7 +29,7 @@ function CardContainer({ name, card_id }: CardContainerProps) {
     const deleteTask = useDeleteTask();
 
     const handleCreateTask = (name: string, description: string) => {
-        createTask.mutate({ name, description, card_id, board_id: id as string }, {
+        createTask.mutate({ name: name, description: description, card_id, board_id: id as string }, {
             onSuccess: () => {
                 alert('Task created successfully');
             }
@@ -82,7 +82,7 @@ function CardContainer({ name, card_id }: CardContainerProps) {
 
                 <div className="max-h-[70vh] overflow-y-auto flex flex-col gap-2">
                     {tasks?.map((task, idx) => (
-                        <div onClick={() => setSelectedTask(task)} key={idx} className='cursor-pointer'>
+                        <div onClick={() => setSelectedTask(task)} key={idx} className='cursor-pointer mb-2'>
                             <TaskItem key={idx} item={task} />
                         </div>
                     ))}
@@ -110,6 +110,7 @@ function CardContainer({ name, card_id }: CardContainerProps) {
 
             {selectedTask && (
                 <TaskDetailModal
+                    card_id={card_id}
                     task={selectedTask}
                     isOpen={selectedTask !== null}
                     onDelete={() => handleDeleteTask(selectedTask.id)}

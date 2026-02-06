@@ -47,6 +47,15 @@ exports.getMembers = async (req, res) => {
     res.status(200).json(members);
 }
 
+exports.addMemberToBoard = async (req, res) => {
+    const boardId = req.params.id;
+    const { memberId } = req.body;
+
+    const board = await Board.addMemberId(boardId, memberId);
+
+    res.status(201).json(board);
+}
+
 exports.updateBoard = async (req, res) => {
     const boardId = req.params.id;
     const { name, description, is_active } = req.body;

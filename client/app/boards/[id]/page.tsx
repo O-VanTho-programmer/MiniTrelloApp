@@ -7,7 +7,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { FaPlus, FaUserPlus } from 'react-icons/fa';
 import CardContainer from '@/app/components/list/CardContainer';
-import { useGetBoardById, useGetMembers, useUpdateStatusBoard } from '@/hooks/useBoards';
+import { useGetMembers, useUpdateStatusBoard } from '@/hooks/useBoards';
 
 const MEMBERS = [
     { id: 1, name: 'User 1', avatar: 'SD', color: 'bg-red-600' },

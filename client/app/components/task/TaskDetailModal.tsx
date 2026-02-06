@@ -1,17 +1,36 @@
 import { FaTimes, FaGithub, FaUser, FaArchive, FaRegCreditCard, FaAlignLeft, FaUserPlus } from 'react-icons/fa';
-import { BsEye } from 'react-icons/bs';
+import { BsEye, BsPlus } from 'react-icons/bs';
 import Button from '../ui/Button/Button';
 import { Task } from '@/types/Task';
+import { useGetMembers } from '@/hooks/useBoards';
+import { useParams } from 'next/navigation';
+import Avatar from '../ui/Avatar';
+import { useMemo, useState } from 'react';
+import AddMemberModal from './AddMemberModal';
+import { useGetAssignedMemberFromTask } from '@/hooks/useTasks';
 
 type TaskDetailModalProps = {
     task: Task
+    card_id: string
     isOpen: boolean;
     onDelete: (taskId: string) => void;
     onClose: () => void;
 };
 
-export default function TaskDetailModal({ isOpen, task, onDelete, onClose }: TaskDetailModalProps) {
+export default function TaskDetailModal({ isOpen, card_id, task, onDelete, onClose }: TaskDetailModalProps) {
     if (!isOpen) return null;
+
+    const { id } = useParams(); //boardid
+    const { data: membersInBoard, isLoading } = useGetMembers(id as string);
+    const { data: membersWithTaskId } = useGetAssignedMemberFromTask(task.id, card_id, id as string);
+
+    const members = useMemo(() => {
+        if (!membersWithTaskId) return [];
+
+        return membersWithTaskId.members;
+    }, [membersWithTaskId])
+
+    const [openMembersinBoard, setOpenMembersinBoard] = useState<boolean>(false);
 
     return (
         <div
@@ -50,9 +69,11 @@ export default function TaskDetailModal({ isOpen, task, onDelete, onClose }: Tas
                                 <div className="space-y-1.5">
                                     <h4 className="text-xs font-semibold text-gray-400 uppercase">Members</h4>
                                     <div className="flex items-center gap-2">
-                                        <div className="w-8 h-8 rounded-full bg-orange-600 flex items-center justify-center text-white text-xs font-bold shadow-sm ring-2 ring-gray-900">SD</div>
+                                        {members?.map((mem, idx) => (
+                                            <Avatar key={idx} url={mem.avatar_url} />
+                                        ))}
                                         <button className="w-8 h-8 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-300 transition cursor-pointer">
-                                            <FaUserPlus size={12} />
+                                            <BsPlus size={12} />
                                         </button>
                                     </div>
                                 </div>
@@ -85,7 +106,6 @@ export default function TaskDetailModal({ isOpen, task, onDelete, onClose }: Tas
                                         <Button
                                             onClick={() => { }}
                                             style="justify-start bg-gray-800 hover:bg-gray-700 text-gray-300 border-2 border-gray-400"
-                                            icon={FaUser}
                                             title="Show details"
                                         />
                                     </div>
@@ -105,12 +125,20 @@ export default function TaskDetailModal({ isOpen, task, onDelete, onClose }: Tas
                             <div className="space-y-2">
                                 <span className="text-sm font-semibold text-gray-500">Add to card</span>
                                 <Button
-                                    onClick={() => { }}
+                                    onClick={() => setOpenMembersinBoard(true)}
                                     style="justify-start bg-gray-800 hover:bg-gray-700 text-gray-300 border-2 border-gray-400"
                                     icon={FaUser}
                                     title="Members"
                                 />
-
+                                {openMembersinBoard && (
+                                    <div className='absolute'>
+                                        <AddMemberModal
+                                            members={membersInBoard || []}
+                                            membersInTask={members || []}
+                                            onClose={() => setOpenMembersinBoard(false)}
+                                        />
+                                    </div>
+                                )}
                             </div>
 
                             <div>

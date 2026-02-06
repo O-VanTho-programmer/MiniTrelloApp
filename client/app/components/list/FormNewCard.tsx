@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FaTimes } from 'react-icons/fa';
 import Button from '../ui/Button/Button';
 
@@ -21,8 +21,20 @@ function FormNewCard({
 
     if (!isOpen) return null;
 
+    useEffect(() => {
+        setName('');
+        setDescription('');
+    }, [isOpen])
+
+
     const handleAddList = () => {
-        onSubmit(name, description);
+        if (name.trim().length > 0) {
+            onSubmit(name, description);
+        } else {
+            setName('');
+            setDescription('');
+            onClose();
+        }
     }
 
     return (

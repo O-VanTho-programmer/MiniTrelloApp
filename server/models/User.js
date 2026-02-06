@@ -15,6 +15,8 @@ class User {
   }
 
   static async getByIds(ids) {
+    if(ids.length === 0) return;
+
     const users = await db.collection("users").where("id", "in", ids).get();
 
     return users.docs.map(user => {

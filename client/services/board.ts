@@ -17,6 +17,8 @@ export const getMembers = async (id: string): Promise<User[]> => {
     return data;
 }
 
+// export const invite
+
 export const getBoardsByUser = async (): Promise<Board[]> => {
     const { data } = await instance.get("/boards/user")
     return data;

@@ -1,3 +1,4 @@
+const { FieldValue } = require("firebase-admin/firestore");
 const { db } = require("../config/db");
 
 class Board {
@@ -47,10 +48,10 @@ class Board {
 
     static async getByUser(userId) {
         const boards = await db.collection('boards').where('member_ids', 'array-contains', userId).where('is_active', '!=', false).get();
-       
+
         return boards.docs.map(board => {
             const data = board.data();
-           
+
             return new Board(board.id, data.name, data.description, data.owner_id, data.member_ids, data.create_at);
         });
     }
@@ -70,6 +71,14 @@ class Board {
         await db.collection('boards').doc(id).update(data);
 
         return { id, ...data };
+    }
+
+    static async addMemberId(id, memberId) {
+        const board = await db.collection('boards').doc(id).set({
+            member_ids: FieldValue.arrayUnion(memberId)
+        }, { merge: true })
+
+        return board;
     }
 
     static async delete(id) {
