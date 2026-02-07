@@ -12,6 +12,7 @@ const transporter = nodemailer.createTransport({
     }
 })
 
+module.exports.transporter = transporter;
 
 exports.githubLogin = async (req, res) => {
     try {
@@ -131,7 +132,7 @@ exports.sendCode = async (req, res) => {
     const existUser = await User.getByEmail(email);
 
     if (existUser) {
-        res.status(400).json({ error: "User already exists" });
+        res.status(401).json({ error: "User already exists" });
         return;
     }
 
@@ -155,7 +156,7 @@ exports.signUp = async (req, res) => {
         const authCode = await AuthCode.verify(email, Number(code));
 
         if (!authCode) {
-            return res.status(400).json({ error: "Invalid code" });
+            return res.status(401).json({ error: "Invalid code" });
         }
 
         const newUser = await User.create(name, email);
@@ -191,7 +192,7 @@ exports.signIn = async (req, res) => {
         const authCode = await AuthCode.verify(email, Number(code));
 
         if (!authCode) {
-            return res.status(400).json({ error: "Invalid code" });
+            return res.status(401).json({ error: "Invalid code" });
         }
 
         const user = await User.getByEmail(email);

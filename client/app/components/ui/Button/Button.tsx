@@ -7,6 +7,7 @@ type ButtonProps = {
     title: string
     onClick: () => void
     style?: string,
+    disabled?: boolean
 }
 
 function Button({
@@ -14,13 +15,14 @@ function Button({
     iconSize = 16,
     title,
     onClick,
-    style
+    style,
+    disabled = false,
 }: ButtonProps) {
 
     const Icon = icon || null
 
     return (
-        <button type="button" className={`${style || ''} cursor-pointer py-2 px-4 rounded-sm flex justify-between items-center gap-2`} onClick={onClick}>
+        <button disabled={disabled} type="button" className={`${style || ''} disabled:bg-gray-500 disabled:text-gray-700 cursor-pointer py-2 px-4 rounded-sm flex justify-between items-center gap-2`} onClick={onClick}>
             {Icon && <Icon size={iconSize} />}
             <span>{title}</span>
         </button>

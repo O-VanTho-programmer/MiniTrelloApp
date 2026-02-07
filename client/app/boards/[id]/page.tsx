@@ -9,13 +9,6 @@ import { FaPlus, FaUserPlus } from 'react-icons/fa';
 import CardContainer from '@/app/components/list/CardContainer';
 import { useGetMembers, useUpdateStatusBoard } from '@/hooks/useBoards';
 
-const MEMBERS = [
-    { id: 1, name: 'User 1', avatar: 'SD', color: 'bg-red-600' },
-    { id: 2, name: 'User 2', avatar: 'SD', color: 'bg-orange-600' },
-    { id: 3, name: 'User 3', avatar: 'SD', color: 'bg-yellow-600' },
-    { id: 4, name: 'User 4', avatar: 'SD', color: 'bg-red-500' },
-];
-
 function BoardPage() {
     const { id } = useParams();
     const router = useRouter();
@@ -27,7 +20,6 @@ function BoardPage() {
 
     const createCard = useCreateCard();
     const updateStatusBoard = useUpdateStatusBoard();
-
 
     const handleCreateCard = (name: string) => {
         createCard.mutate({ name, board_id: id as string }, {

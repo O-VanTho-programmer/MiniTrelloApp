@@ -11,9 +11,12 @@ router.use(authenticateToken);
 router.get('/', boardController.getAllBoard);
 router.post('/', boardController.newBoard);
 router.get('/user', boardController.getBoardsByUser);
+router.get('/user/invites', boardController.getBoardsByUser);
 router.get('/:id', boardController.getBoard);
 router.get('/:id/members', boardController.getMembers);
 router.post('/:id/members', boardController.addMemberToBoard)
+router.post('/:id/invite', boardController.sendInvite)
+router.post('/:id/accept-invite/:inviteId', boardController.acceptInvite)
 router.put('/:id', boardController.updateBoard);
 router.delete('/:id', boardController.deleteBoard);
 

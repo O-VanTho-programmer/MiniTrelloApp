@@ -27,6 +27,16 @@ class User {
     return new User(newUser.id, name, email, "", "email");
   }
 
+  static async getById(id) {
+    const user = await db.collection("users").doc(id).get();
+
+    if (!user.exists) {
+      throw new Error("User not found");
+    };
+    const data = user.data();
+    return new User(id, data.name, data.email, data.avatar_url, data.provider);
+  }
+
   static async getByIds(ids) {
     if (ids.length === 0) return;
 
