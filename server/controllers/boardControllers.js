@@ -98,9 +98,9 @@ exports.sendInvite = async (req, res) => {
 
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
-            to: email,
+            to: receiver.email,
             subject: "Board Invitation",
-            text: `${sender} invite you to his/her board. Check it out!`
+            text: `${sender.name} invite you to his/her board. Check it out!`
         })
 
         res.status(201).json(invitation);

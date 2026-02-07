@@ -70,7 +70,7 @@ export default function TaskDetailModal({ isOpen, card_id, task, onDelete, onClo
                                     <h4 className="text-xs font-semibold text-gray-400 uppercase">Members</h4>
                                     <div className="flex items-center gap-2">
                                         {members?.map((mem, idx) => (
-                                            <Avatar key={idx} url={mem.avatar_url} />
+                                            <Avatar key={idx} user={mem} />
                                         ))}
                                         <button className="w-8 h-8 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-300 transition cursor-pointer">
                                             <BsPlus size={12} />

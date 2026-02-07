@@ -32,7 +32,7 @@ function AddMemberModal({ onClose, members, membersInTask }: AddMemberModalProps
                             key={mem.id}
                             onClick={() => { }}
                             className='flex items-center w-full gap-3'>
-                            <Avatar url={mem.avatar_url} />
+                            <Avatar user={mem} />
                             <span>{mem.name}</span>
 
                             {membersInTask.some(m => m.id === mem.id) && (

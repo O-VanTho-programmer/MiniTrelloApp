@@ -15,3 +15,8 @@ export const declineInvitation = async (inviteId: string) => {
     const { data } = await instance.post(`/boards/invite-respone/${inviteId}`, { status: "declined" });
     return data;
 }
+
+export const sendInvitation = async (boardId: string, receiverId: string) => {
+    const { data } = await instance.post(`/boards/${boardId}/invite`, { receiverId })
+    return data;
+}

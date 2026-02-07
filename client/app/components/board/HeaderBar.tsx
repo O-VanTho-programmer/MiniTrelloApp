@@ -6,9 +6,18 @@ import { InvitationWithSenderName } from "@/types/Invitation";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { BiBell, BiCheck, BiX } from "react-icons/bi"
+import Avatar from "../ui/Avatar";
+import { useRouter } from "next/navigation";
 
 function HeaderBar() {
+    const router = useRouter();
     const user = useUser();
+
+    if (!user) {
+        router.push('/auth');
+        return null;
+    }
+
     const { data: invitations } = useGetInvitations(user?.id || '');
 
     const [isNotifMenuOpen, setIsNotifMenuOpen] = useState(false);
@@ -100,9 +109,10 @@ function HeaderBar() {
                     )}
                 </div>
                 <div className="relative">
-                    <img className="peer rounded-full w-[40px] h-[40px] object-cover cursor-pointer" src={""} />
-
-                    <ul className="absolute right-0 bg-gray-700 hidden peer-hover:block hover:block rounded-sm p-1 min-w-[100px]">
+                    <div className="peer cursor-pointer">
+                        <Avatar user={user} />
+                    </div>
+                    <ul className="z-50 absolute right-0 bg-gray-700 hidden peer-hover:block hover:block hover:bg-gray-600 rounded-sm p-1 min-w-[100px]">
                         <li onClick={handleLogout} className="cursor-pointer py-1 px-3 text-center">Logout</li>
                     </ul>
                 </div>

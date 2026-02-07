@@ -6,5 +6,7 @@ const authenticateToken = require('../middleware');
 router.use(authenticateToken);
 
 router.get('/current-user', userController.getUser);
+router.get('/search', userController.getUserByEmailSearch);
+
 
 module.exports = router;

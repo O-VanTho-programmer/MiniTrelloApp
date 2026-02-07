@@ -20,3 +20,8 @@ export const getUser = async (): Promise<User> => {
     const { data } = await instance.get("/users/current-user");
     return data;
 }
+
+export const getUserByEmailSearch = async (email: string): Promise<User[]> => {
+    const { data } = await instance.get(`/users/search?email=${email}`);
+    return data;
+}

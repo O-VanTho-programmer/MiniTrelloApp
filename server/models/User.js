@@ -53,6 +53,15 @@ class User {
 
     return user.docs[0].data();
   }
+
+  static async getByEmailSearch(email) {
+    const users = await db.collection("users").where("email", ">=", email).where("email", "<=", email + "\uf8ff").limit(5).get();
+
+    return users.docs.map(user => {
+      const data = user.data();
+      return new User(user.id, data.name, data.email, data.avatar_url, data.provider);
+    })
+  }
 }
 
 

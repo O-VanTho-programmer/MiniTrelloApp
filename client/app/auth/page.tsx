@@ -51,7 +51,7 @@ export default function AuthPage({ }) {
                 const queryClient = useQueryClient();
                 queryClient.invalidateQueries({ queryKey: ["user"] });
 
-                router.push("/boards");
+                // router.push("/boards");
             }
         })
     }

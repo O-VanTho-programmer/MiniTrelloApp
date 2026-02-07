@@ -11,3 +11,16 @@ exports.getUser = async (req, res) => {
         res.status(500).json({ error: "Error get user" });
     }
 }
+
+exports.getUserByEmailSearch = async (req, res) =>{
+    try {
+        const {email} = req.query;
+
+        const users = await User.getByEmailSearch(email);
+
+        res.status(200).json(users);
+    } catch (error) {
+        console.error("Error search user by email", error);
+        res.status(500).json({ error: "Error search user by email" });
+    }
+}

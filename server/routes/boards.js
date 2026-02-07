@@ -16,7 +16,7 @@ router.get('/:id', boardController.getBoard);
 router.get('/:id/members', boardController.getMembers);
 router.post('/:id/members', boardController.addMemberToBoard)
 router.post('/:id/invite', boardController.sendInvite)
-router.post('/:id/invite-respone/:inviteId', boardController.responeInvite)
+router.post('/invite-respone/:inviteId', boardController.responeInvite)
 router.put('/:id', boardController.updateBoard);
 router.delete('/:id', boardController.deleteBoard);
 

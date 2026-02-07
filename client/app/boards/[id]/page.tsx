@@ -1,27 +1,37 @@
 'use client';
 
 import SideBoard from '@/app/components/board/SideBoard'
-import FormNewList from '@/app/components/list/FormNewCard';
+import FormNewList from '@/app/components/card/FormNewCard';
 import { useCreateCard, useGetCardsByBoardId } from '@/hooks/useCards';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { FaPlus, FaUserPlus } from 'react-icons/fa';
-import CardContainer from '@/app/components/list/CardContainer';
+import CardContainer from '@/app/components/card/CardContainer';
 import { useGetMembers, useUpdateStatusBoard } from '@/hooks/useBoards';
+import { useSendInvitation } from '@/hooks/useInvitation';
+import InviteMember from '@/app/components/board/InviteMember';
+import { useGetUserByEmailSearch } from '@/hooks/useAuth';
+import { User } from '@/types/User';
+import { getUserByEmailSearch } from '@/services/auth';
 
 function BoardPage() {
     const { id } = useParams();
     const router = useRouter();
 
-    const {data: membersInBoard} = useGetMembers(id as string);
+    const { data: membersInBoard } = useGetMembers(id as string);
     const { data: cards, isLoading: isLoadingCards, isError: isErrorCards, error: errorCards } = useGetCardsByBoardId(id as string);
 
     const [isCreatingList, setIsCreatingList] = useState(false);
+    const [openInviteMembers, setOpenInviteMember] = useState(false);
 
     const createCard = useCreateCard();
     const updateStatusBoard = useUpdateStatusBoard();
+    const sendInvite = useSendInvitation();
+
 
     const handleCreateCard = (name: string) => {
+        if (!confirm("Are you sure you want to close this board?")) return;
+
         createCard.mutate({ name, board_id: id as string }, {
             onSuccess: () => {
                 alert('Card created successfully');
@@ -38,6 +48,43 @@ function BoardPage() {
         })
     }
 
+    const handleSendInvite = (receiveIds: string[]) => {
+        if (receiveIds.length === 0) return;
+
+        receiveIds.forEach((receiveId) => {
+            sendInvite.mutate({ boardId: id as string, receiveId }, {
+                onSuccess: () => {
+                    console.log(`Invite sent to ${receiveId}`);
+                },
+                onError: () => {
+                    alert(`Failed to send invite to user ID: ${receiveId}`);
+                }
+            });
+        });
+
+        alert(`Sent invitations`);
+        setOpenInviteMember(false);
+        setSearchedUsers(null);
+    }
+
+    const [searchedUsers, setSearchedUsers] = useState<User[] | null>(null);
+    const [isSearching, setIsSearching] = useState<boolean>(false);
+
+    const handleSearchUserByEmail = async (email: string) => {
+        if (!email.trim()) return;
+        setIsSearching(true);
+
+        try {
+            const searchedUsers = await getUserByEmailSearch(email);
+            setSearchedUsers(searchedUsers || []);
+        } catch (error) {
+            setSearchedUsers([]);
+            console.error('Error searching users:', error);
+        } finally {
+            setIsSearching(false);
+        }
+    };
+
     return (
         <div className='flex'>
             <SideBoard
@@ -47,10 +94,11 @@ function BoardPage() {
                 <header className='flex justify-between items-center px-4 py-2 bg-pink-600 text-white'>
                     <h3 className=''>My Trello board</h3>
 
-                    <button className="flex items-center gap-2 bg-black hover:bg-gray-800 px-3 py-1.5 rounded text-sm font-medium cursor-pointer">
+                    <button onClick={() => setOpenInviteMember(true)} className="flex items-center gap-2 bg-black hover:bg-gray-800 px-3 py-1.5 rounded text-sm font-medium cursor-pointer">
                         <FaUserPlus size={14} />
                         <span>Invite member</span>
                     </button>
+
                 </header>
 
                 <main className="flex-1 overflow-x-auto overflow-y-hidden h-full bg-white p-6">
@@ -81,6 +129,17 @@ function BoardPage() {
                     </div>
                 </main>
             </section>
+
+            {openInviteMembers && (
+                <InviteMember
+                    isSearching={isSearching}
+                    searchedUsers={searchedUsers}
+                    onSearch={handleSearchUserByEmail}
+                    onSend={handleSendInvite}
+                    onClose={() => setOpenInviteMember(false)}
+                    alreadyMembers={membersInBoard || []}
+                />
+            )}
         </div>
     )
 }

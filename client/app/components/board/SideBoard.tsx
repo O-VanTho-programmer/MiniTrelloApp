@@ -30,7 +30,7 @@ export default function SideBoard({ members = [], onCloseBoard }: SideBoardProps
                 <div className="space-y-3">
                     {members.map((mem) => (
                         <div key={mem.id} className="flex items-center gap-3 cursor-pointer hover:bg-white/10 p-2 rounded-lg transition">
-                            <Avatar url={mem.avatar_url} />
+                            <Avatar user={mem} />
                             <span className="text-sm font-medium text-gray-200">{mem.name}</span>
                         </div>
                     ))}
