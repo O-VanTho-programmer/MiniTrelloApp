@@ -1,10 +1,16 @@
-import { getUser, getUserByEmailSearch, sendCode, signin, signup } from "@/services/auth"
+import { getUser, getUserByEmailSearch, sendCodeLogin, sendCodeSignup, signin, signup } from "@/services/auth"
 import { User } from "@/types/User"
 import { useMutation, useQuery } from "@tanstack/react-query"
 
-export const useSendCode = () => {
+export const useSendCodeSignup = () => {
     return useMutation({
-        mutationFn: ({ email }: { email: string }) => sendCode(email),
+        mutationFn: ({ email }: { email: string }) => sendCodeSignup(email),
+    })
+}
+
+export const useSendCodeSignin = () => {
+    return useMutation({
+        mutationFn: ({ email }: { email: string }) => sendCodeLogin(email),
     })
 }
 

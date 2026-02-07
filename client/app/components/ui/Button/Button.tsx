@@ -1,4 +1,5 @@
 import { IconType } from "react-icons"
+import { FaSpinner } from "react-icons/fa";
 
 
 type ButtonProps = {
@@ -7,7 +8,8 @@ type ButtonProps = {
     title: string
     onClick: () => void
     style?: string,
-    disabled?: boolean
+    disabled?: boolean,
+    isSaving?: boolean,
 }
 
 function Button({
@@ -17,14 +19,24 @@ function Button({
     onClick,
     style,
     disabled = false,
+    isSaving
 }: ButtonProps) {
 
     const Icon = icon || null
 
     return (
         <button disabled={disabled} type="button" className={`${style || ''} disabled:bg-gray-500 disabled:text-gray-700 cursor-pointer py-2 px-4 rounded-sm flex justify-between items-center gap-2`} onClick={onClick}>
-            {Icon && <Icon size={iconSize} />}
-            <span>{title}</span>
+            {isSaving ? (
+                <>
+                    <FaSpinner className="animate-spin text-4xl mb-4" />
+                    <span>Saving...</span>
+                </>
+            ) : (
+                <>
+                    {Icon && <Icon size={iconSize} />}
+                    <span>{title}</span>
+                </>
+            )}
         </button>
     )
 }

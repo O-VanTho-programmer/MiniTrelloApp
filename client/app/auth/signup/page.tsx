@@ -1,7 +1,6 @@
 'use client';
 import Button from '@/app/components/ui/Button/Button';
-import { useSendCode, useSignUp } from '@/hooks/useAuth';
-import { sendCode } from '@/services/auth';
+import { useSendCodeSignup, useSignUp } from '@/hooks/useAuth';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import { useState } from 'react'
@@ -17,7 +16,7 @@ function signupPage() {
     const [openVerifyCode, setOpenVerifyCode] = useState<boolean>(false);
     const [inputCode, setInputCode] = useState<string>("");
 
-    const sendCode = useSendCode();
+    const sendCode = useSendCodeSignup();
     const signup = useSignUp();
 
     const handleSignup = async () => {
@@ -27,14 +26,14 @@ function signupPage() {
             onSuccess: () => {
                 alert("Code sent successfully");
                 setOpenVerifyCode(true);
-            }
+            },
         })
     }
 
     const handleCheckCode = () => {
         if (inputCode) {
             signup.mutate({ name, email, code: inputCode }, {
-                onSuccess: ({data}) => {
+                onSuccess: ({ data }) => {
                     alert("Sign up successfully");
                     const queryClient = useQueryClient();
                     queryClient.invalidateQueries({ queryKey: ["user"] });
@@ -62,6 +61,8 @@ function signupPage() {
                         <input value={email} onChange={(e) => setEmail(e.target.value)} className="p-3 border rounded" type="email" placeholder="Enter email" />
 
                         <Button
+                            disabled={sendCode.isPending}
+                            isSaving={sendCode.isPending}
                             style='bg-black text-white justify-center'
                             title="Sign Up"
                             onClick={handleSignup} />
@@ -72,6 +73,8 @@ function signupPage() {
                         <label>Enter your code</label>
                         <input value={inputCode} onChange={(e) => setInputCode(e.target.value)} className="p-3 border rounded" type="text" placeholder="Enter code" />
                         <Button
+                            disabled={signup.isPending}
+                            isSaving={signup.isPending}
                             style='bg-black text-white justify-center'
                             title="Sign Up"
                             onClick={handleCheckCode} />

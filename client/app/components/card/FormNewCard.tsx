@@ -57,6 +57,7 @@ function FormNewCard({
 
             <div className="flex items-center gap-2">
                 <Button
+                    disabled={name.trim().length === 0}
                     onClick={handleAddList}
                     title={title}
                     style="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded text-sm"

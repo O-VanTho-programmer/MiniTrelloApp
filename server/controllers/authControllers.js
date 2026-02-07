@@ -183,6 +183,29 @@ exports.signUp = async (req, res) => {
     }
 }
 
+exports.sendCodeForLogin = async (req, res) => {
+    const { email } = req.body;
+
+    const existUser = await User.getByEmail(email);
+
+    if (!existUser) {
+        res.status(401).json({ error: "User is not signup" });
+        return;
+    }
+
+    const code = Math.floor(Math.random() * 90000) + 10000;;
+
+    await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: "Verify Email",
+        text: `Your verification code is: ${code}`
+    })
+
+    const newAuthCode = await AuthCode.create(email, code);
+    res.status(201).json(newAuthCode);
+}
+
 exports.signIn = async (req, res) => {
     try {
         const { email, code } = req.body;

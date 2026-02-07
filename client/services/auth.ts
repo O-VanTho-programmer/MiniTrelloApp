@@ -1,8 +1,13 @@
 import instance from "@/lib/axios"
 import { User } from "@/types/User";
 
-export const sendCode = async (email: string) => {
-    const { data } = await instance.post("/auth/send-code", { email });
+export const sendCodeSignup = async (email: string) => {
+    const { data } = await instance.post("/auth/send-code-signup", { email });
+    return data;
+}
+
+export const sendCodeLogin = async (email: string) => {
+    const { data } = await instance.post("/auth/send-code-login", { email });
     return data;
 }
 

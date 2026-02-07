@@ -3,7 +3,7 @@
 import { FaGithub, FaGoogle } from "react-icons/fa";
 import Button from "../components/ui/Button/Button"
 import { useState } from "react";
-import { useSendCode, useSignIn } from "@/hooks/useAuth";
+import { useSendCodeSignin, useSignIn } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -25,7 +25,7 @@ export default function AuthPage({ }) {
     const [openVerifyCode, setOpenVerifyCode] = useState<boolean>(false);
     const [inputCode, setInputCode] = useState<string>("");
 
-    const sendCode = useSendCode();
+    const sendCode = useSendCodeSignin();
     const signin = useSignIn();
 
     const handleSendCode = () => {
@@ -66,13 +66,21 @@ export default function AuthPage({ }) {
                         <label>Email</label>
                         <input value={email} onChange={(e) => setEmail(e.target.value)} className="p-3 border rounded" type="email" placeholder="Enter email" />
                         <Button
+                            isSaving={sendCode.isPending}
+                            disabled={sendCode.isPending}
                             style='bg-black text-white justify-center'
                             title="Login"
                             onClick={handleSendCode} />
 
                         <div className="flex flex-col sm:flex-row gap-2 flex-wrap">
-                            <Button icon={FaGithub} style="bg-black text-white" title="Login with Github" onClick={handleGithubLogin} />
-                            <Button icon={FaGoogle} style="bg-red-500 text-white" title="Login with Google" onClick={handleGoogleLogin} />
+                            <Button icon={FaGithub}
+                                style="bg-black text-white"
+                                title="Login with Github"
+                                onClick={handleGithubLogin} />
+                            <Button icon={FaGoogle}
+                                style="bg-red-500 text-white"
+                                title="Login with Google"
+                                onClick={handleGoogleLogin} />
 
                         </div>
                         <a href="/auth/signup" className="text-center text-gray-600 hover:text-gray-500">Signup with Email</a>
@@ -83,6 +91,8 @@ export default function AuthPage({ }) {
                         <label>Enter your code</label>
                         <input value={inputCode} onChange={(e) => setInputCode(e.target.value)} className="p-3 border rounded" type="text" placeholder="Enter code" />
                         <Button
+                            isSaving={signin.isPending}
+                            disabled={signin.isPending}
                             style='bg-black text-white justify-center'
                             title="Sign Up"
                             onClick={handleSignin} />

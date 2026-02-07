@@ -51,6 +51,10 @@ class User {
   static async getByEmail(email) {
     const user = await db.collection("users").where("email", "==", email).get();
 
+    if(user.empty){
+      return null;
+    }
+
     return user.docs[0].data();
   }
 
