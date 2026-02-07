@@ -5,6 +5,7 @@ import Button from "../components/ui/Button/Button"
 import { useState } from "react";
 import { useSendCode, useSignIn } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function AuthPage({ }) {
     const router = useRouter();
@@ -46,6 +47,10 @@ export default function AuthPage({ }) {
                 alert("Sign in successfully");
                 localStorage.setItem("token", data.token);
                 localStorage.setItem("user", JSON.stringify(data.user));
+
+                const queryClient = useQueryClient();
+                queryClient.invalidateQueries({ queryKey: ["user"] });
+
                 router.push("/boards");
             }
         })

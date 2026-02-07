@@ -2,6 +2,7 @@
 import Button from '@/app/components/ui/Button/Button';
 import { useSendCode, useSignUp } from '@/hooks/useAuth';
 import { sendCode } from '@/services/auth';
+import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import { useState } from 'react'
 
@@ -35,6 +36,9 @@ function signupPage() {
             signup.mutate({ name, email, code: inputCode }, {
                 onSuccess: ({data}) => {
                     alert("Sign up successfully");
+                    const queryClient = useQueryClient();
+                    queryClient.invalidateQueries({ queryKey: ["user"] });
+
                     localStorage.setItem("token", data.token);
                     localStorage.setItem("user", JSON.stringify(data.user));
 

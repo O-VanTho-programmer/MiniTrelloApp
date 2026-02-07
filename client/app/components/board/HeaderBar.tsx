@@ -1,13 +1,15 @@
 'use client'
 
 import { useGetInvitations } from "@/hooks/useInvitation";
+import { useUser } from "@/provider/UserProvider";
 import { InvitationWithSenderName } from "@/types/Invitation";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { BiBell, BiCheck, BiX } from "react-icons/bi"
 
 function HeaderBar() {
-
-    const {data: invitations} = useGetInvitations();
+    const user = useUser();
+    const {data: invitations} = useGetInvitations(user?.id || '');
 
     const [isNotifMenuOpen, setIsNotifMenuOpen] = useState(false);
     const notifRef = useRef<HTMLDivElement>(null);
@@ -24,6 +26,7 @@ function HeaderBar() {
     }, [])
 
     const handleAcceptInvitation = (invitation: InvitationWithSenderName) => {
+   
     }
 
     const handleRejectInvitation = (invitation: InvitationWithSenderName) => {
@@ -33,6 +36,9 @@ function HeaderBar() {
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        const queryClient = useQueryClient();
+        queryClient.setQueryData(["user"], null);
+
         window.location.href = '/auth';
     }
 

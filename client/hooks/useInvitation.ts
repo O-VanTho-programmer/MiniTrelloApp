@@ -7,3 +7,11 @@ export const useGetInvitations = (userId: string) => {
         queryFn: getInvitations
     })
 }
+
+export const useAcceptInvitation = ()=>{
+
+}
+
+export const useDeclineInvitation = ()=>{
+
+}

@@ -61,8 +61,6 @@ exports.githubLogin = async (req, res) => {
 
         const savedUser = await User.createOrUpdate(userData);
 
-        console.log(savedUser);
-
         return res.status(200).json({ message: "Login successfully", token, user: savedUser })
 
     } catch (error) {

@@ -1,4 +1,5 @@
 'use client';
+import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
@@ -8,6 +9,7 @@ export default function GithubCallbackPage() {
     const searchParams = useSearchParams();
     const code = searchParams.get("code");
     const router = useRouter();
+    const queryClient = useQueryClient();
 
 
     useEffect(() => {
@@ -23,6 +25,8 @@ export default function GithubCallbackPage() {
                 const { token, user } = res.data;
 
                 if (token) {
+                    queryClient.invalidateQueries({ queryKey: ["user"] });
+
                     localStorage.setItem("token", token);
                     localStorage.setItem("user", JSON.stringify(user));
                 }
