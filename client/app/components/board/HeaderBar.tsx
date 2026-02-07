@@ -1,6 +1,6 @@
 'use client'
 
-import { useGetInvitations } from "@/hooks/useInvitation";
+import { useAcceptInvitation, useDeclineInvitation, useGetInvitations } from "@/hooks/useInvitation";
 import { useUser } from "@/provider/UserProvider";
 import { InvitationWithSenderName } from "@/types/Invitation";
 import { useQueryClient } from "@tanstack/react-query";
@@ -9,7 +9,7 @@ import { BiBell, BiCheck, BiX } from "react-icons/bi"
 
 function HeaderBar() {
     const user = useUser();
-    const {data: invitations} = useGetInvitations(user?.id || '');
+    const { data: invitations } = useGetInvitations(user?.id || '');
 
     const [isNotifMenuOpen, setIsNotifMenuOpen] = useState(false);
     const notifRef = useRef<HTMLDivElement>(null);
@@ -25,11 +25,24 @@ function HeaderBar() {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [])
 
+    const acceptInvite = useAcceptInvitation();
+    const declineInvite = useDeclineInvitation();
+
+
     const handleAcceptInvitation = (invitation: InvitationWithSenderName) => {
-   
+        acceptInvite.mutate({ inviteId: invitation.id }, {
+            onSuccess: () => {
+                alert("Invitation accepted successfully");
+            }
+        })
     }
 
     const handleRejectInvitation = (invitation: InvitationWithSenderName) => {
+        declineInvite.mutate({ inviteId: invitation.id }, {
+            onSuccess: () => {
+                alert("Invitation declined successfully");
+            }
+        })
     }
 
 
@@ -54,7 +67,7 @@ function HeaderBar() {
                         <BiBell size={16} />
                     </button>
                     {isNotifMenuOpen && (
-                        <div className="absolute right-0 mt-2 w-80 bg-white text-gray-800 rounded shadow-lg border border-gray-200 overflow-hidden">
+                        <div ref={notifRef} className="absolute z-50 right-0 mt-2 w-80 bg-white text-gray-800 rounded shadow-lg border border-gray-200 overflow-hidden">
                             <div className="px-4 py-2 border-b font-semibold bg-gray-50 text-sm">Notifications</div>
                             <div className="max-h-64 overflow-y-auto">
                                 {!invitations || invitations.length === 0 ? (

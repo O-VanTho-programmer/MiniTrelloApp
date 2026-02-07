@@ -1,5 +1,5 @@
-import { getInvitations } from "@/services/invitation"
-import { useQuery } from "@tanstack/react-query"
+import { acceptInvitation, declineInvitation, getInvitations } from "@/services/invitation"
+import { useMutation, useQuery } from "@tanstack/react-query"
 
 export const useGetInvitations = (userId: string) => {
     return useQuery({
@@ -8,10 +8,14 @@ export const useGetInvitations = (userId: string) => {
     })
 }
 
-export const useAcceptInvitation = ()=>{
-
+export const useAcceptInvitation = () => {
+    return useMutation({
+        mutationFn: ({ inviteId }: { inviteId: string }) => acceptInvitation(inviteId)
+    })
 }
 
-export const useDeclineInvitation = ()=>{
-
+export const useDeclineInvitation = () => {
+    return useMutation({
+        mutationFn: ({ inviteId }: { inviteId: string }) => declineInvitation(inviteId)
+    })
 }

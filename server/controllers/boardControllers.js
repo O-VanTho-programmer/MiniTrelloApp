@@ -110,7 +110,7 @@ exports.sendInvite = async (req, res) => {
     }
 }
 
-exports.acceptInvite = async (req, res) => {
+exports.responeInvite = async (req, res) => {
     try {
         const inviteId = req.params.inviteId;
         const { status } = req.body;
