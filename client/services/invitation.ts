@@ -20,3 +20,8 @@ export const sendInvitation = async (boardId: string, receiverId: string) => {
     const { data } = await instance.post(`/boards/${boardId}/invite`, { receiverId })
     return data;
 }
+
+export const deleteInvitation = async (inviteId: string) => {
+    const { data } = await instance.delete(`/boards/invite/${inviteId}`)
+    return data;
+}

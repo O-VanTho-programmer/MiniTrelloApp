@@ -240,6 +240,8 @@ exports.signIn = async (req, res) => {
             { expiresIn: "2h" }
         )
 
+        
+
         res.status(200).json({ message: "Sign in successfully", token, user: userData });
     } catch (error) {
         console.error("Error sign in", error.message);

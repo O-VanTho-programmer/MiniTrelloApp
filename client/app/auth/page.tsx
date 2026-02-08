@@ -7,8 +7,10 @@ import { useSendCodeSignin, useSignIn } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 
-export default function AuthPage({ }) {
+export default function AuthPage() {
     const router = useRouter();
+    const queryClient = useQueryClient();
+
 
     const handleGoogleLogin = () => {
         const GG_CALLBACK_URL = "http://localhost:3000/auth/google/callback";
@@ -43,12 +45,12 @@ export default function AuthPage({ }) {
         if (!email || !inputCode) return;
 
         signin.mutate({ email, code: inputCode }, {
-            onSuccess: ({ data }) => {
+            onSuccess: (data) => {
+
                 alert("Sign in successfully");
                 localStorage.setItem("token", data.token);
                 localStorage.setItem("user", JSON.stringify(data.user));
 
-                const queryClient = useQueryClient();
                 queryClient.invalidateQueries({ queryKey: ["user"] });
 
                 router.push("/boards");

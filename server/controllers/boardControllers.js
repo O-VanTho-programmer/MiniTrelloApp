@@ -120,11 +120,13 @@ exports.responeInvite = async (req, res) => {
             return;
         }
 
-        const invitation = await Invitation.updateStatus(inviteId, { status });
+        const invitation = await Invitation.updateStatus(inviteId, status);
 
         if (invitation && invitation.status === 'accepted') {
+            console.log(invitation);
+
             const board = await Board.getById(invitation.board_id);
-            await Board.addMemberId(board.id, invitation.receiver_id);
+            await Board.addMemberId(board.id, invitation.member_id);
 
             res.status(200).json({ message: "Invitation accepted" });
         } else {
@@ -149,7 +151,7 @@ exports.getInvitations = async (req, res) => {
 
         const inviteWithSender = invitations.map(invitation => {
             const sender = boardOwner.find(owner => owner.id === invitation.board_owner_id);
-            return { ...invitation, sender_name: sender.name};
+            return { ...invitation, sender_name: sender.name };
         });
 
         res.status(200).json(inviteWithSender);
@@ -158,3 +160,16 @@ exports.getInvitations = async (req, res) => {
         res.status(500).json({ error: "Error getting invitations" });
     }
 }
+
+exports.deleteInvitation = async (req, res) => {
+    try {
+        const inviteId = req.params.inviteId;
+
+        const invitation = await Invitation.delete(inviteId);
+
+        res.status(204).json();
+    } catch (error) {
+        console.error("Error deleting invitation", error);
+        res.status(500).json({ error: "Error deleting invitation" });
+    }
+}   

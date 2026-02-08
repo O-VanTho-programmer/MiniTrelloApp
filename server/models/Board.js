@@ -74,6 +74,7 @@ class Board {
     }
 
     static async addMemberId(id, memberId) {
+
         const board = await db.collection('boards').doc(id).set({
             member_ids: FieldValue.arrayUnion(memberId)
         }, { merge: true })

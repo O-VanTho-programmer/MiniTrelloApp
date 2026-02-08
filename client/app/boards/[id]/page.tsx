@@ -4,7 +4,7 @@ import SideBoard from '@/app/components/board/SideBoard'
 import FormNewList from '@/app/components/card/FormNewCard';
 import { useCreateCard, useGetCardsByBoardId } from '@/hooks/useCards';
 import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FaPlus, FaUserPlus } from 'react-icons/fa';
 import CardContainer from '@/app/components/card/CardContainer';
 import { useGetMembers, useUpdateStatusBoard } from '@/hooks/useBoards';
@@ -16,6 +16,7 @@ import { DragDropContext } from '@hello-pangea/dnd';
 import { useQueryClient } from '@tanstack/react-query';
 import { Task } from '@/types/Task';
 import { useDragAndDropMoveTask } from '@/hooks/useTasks';
+import { socket } from '@/lib/socket';
 
 function BoardPage() {
     const { id } = useParams();
@@ -32,6 +33,13 @@ function BoardPage() {
     const updateStatusBoard = useUpdateStatusBoard();
     const sendInvite = useSendInvitation();
 
+    useEffect(() => {
+        socket.connect();
+
+        socket.on("task_move", () => {
+            queryClient.invalidateQueries({ queryKey: ["cards_by_board_id", id as string] });
+        });
+    }, [id, queryClient])
 
     const handleCreateCard = (name: string) => {
         if (!confirm("Are you sure you want to close this board?")) return;
@@ -93,11 +101,8 @@ function BoardPage() {
 
     const handleDragEnd = (result: any) => {
         const { destination, source, draggableId: taskId } = result;
-        console.log(result);
 
         if (!destination) return;
-
-
 
         const sourceCardId = source.droppableId;
         const prevIndexOfTask = source.index;
@@ -141,6 +146,8 @@ function BoardPage() {
                 console.error('Error moving task:', error);
             }
         });
+
+        socket.emit("task_move")
     }
 
     return (

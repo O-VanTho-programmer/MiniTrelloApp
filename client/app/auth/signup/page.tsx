@@ -9,6 +9,7 @@ import { useState } from 'react'
 function signupPage() {
 
     const router = useRouter();
+    const queryClient = useQueryClient();
 
     const [name, setName] = useState<string>("");
     const [email, setEmail] = useState<string>("");
@@ -33,9 +34,8 @@ function signupPage() {
     const handleCheckCode = () => {
         if (inputCode) {
             signup.mutate({ name, email, code: inputCode }, {
-                onSuccess: ({ data }) => {
+                onSuccess: (data) => {
                     alert("Sign up successfully");
-                    const queryClient = useQueryClient();
                     queryClient.invalidateQueries({ queryKey: ["user"] });
 
                     localStorage.setItem("token", data.token);

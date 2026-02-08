@@ -15,10 +15,13 @@ router.get('/user/invites', boardController.getInvitations);
 router.get('/:id', boardController.getBoard);
 router.get('/:id/members', boardController.getMembers);
 router.post('/:id/members', boardController.addMemberToBoard)
+
+// Invite
 router.post('/:id/invite', boardController.sendInvite)
 router.post('/invite-respone/:inviteId', boardController.responeInvite)
 router.put('/:id', boardController.updateBoard);
 router.delete('/:id', boardController.deleteBoard);
+router.delete('/invite/:inviteId', boardController.deleteInvitation);
 
 
 // Card

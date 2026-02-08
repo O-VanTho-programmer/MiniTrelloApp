@@ -19,7 +19,7 @@ class AuthCode {
     }
 
     static async verify(email, code) {
-        const authCode = await db.collection("auth_codes").where("email", "==", email).where("code", "==", code).orderBy("expired_time", "desc").limit(1).get();
+        const authCode = await db.collection("auth_codes").where("email", "==", email).orderBy("expired_time", "desc").limit(1).get();
 
         if (authCode.empty) {
             return false;
@@ -29,6 +29,12 @@ class AuthCode {
         if (expireTime < Date.now()) {
             return false;
         }
+
+        if (authCode.docs[0].data().code !== code) {
+            return false;
+        }
+
+        await db.collection("auth_codes").doc(authCode.docs[0].id).delete();
 
         return true;
     }

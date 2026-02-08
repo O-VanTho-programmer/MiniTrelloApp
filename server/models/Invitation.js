@@ -23,7 +23,7 @@ class Invitation {
 
         const existInvitation = await db.collection('invitations').where('member_id', '==', member_id).where('board_id', '==', board_id).where('board_owner_id', '==', board_owner_id).get();
 
-        if (existInvitation) {
+        if (!existInvitation.empty) {
             const updateInvitation = await db.collection('invitations').doc(existInvitation.docs[0].id).update(dto);
             return new Invitation(existInvitation.docs[0].id, board_id, board_owner_id, member_id, email_member, 'pending', dto.create_at);
         } else {
@@ -36,7 +36,7 @@ class Invitation {
     static async updateStatus(id, status) {
         const invitation = db.collection('invitations').doc(id);
         await invitation.update({ status: status });
-
+        
         const data = (await invitation.get()).data();
 
         return new Invitation(id, data.board_id, data.board_owner_id, data.member_id, data.email_member, status, data.create_at);
@@ -51,6 +51,10 @@ class Invitation {
         });
     }
 
+    static async delete(id) {
+        await db.collection('invitations').doc(id).delete();
+        return true;
+    }
 }
 
 module.exports = Invitation;
