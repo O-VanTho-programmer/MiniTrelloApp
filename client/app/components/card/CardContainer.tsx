@@ -1,5 +1,5 @@
 import { FaPlus, FaTimes } from 'react-icons/fa'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import FormNewList from './FormNewCard'
 import { BiMenu } from 'react-icons/bi'
 import { useDeleteCard } from '@/hooks/useCards'
@@ -20,7 +20,6 @@ function CardContainer({ name, card_id }: CardContainerProps) {
 
     const { data: tasks } = useGetTasksByCardId(card_id, id as string);
 
-
     const [isCreatingTask, setIsCreatingTask] = useState(false);
     const [openSetting, setOpenSetting] = useState(false);
     const [selectedTask, setSelectedTask] = useState<TaskWithAssignedMember | null>(null);
@@ -28,6 +27,20 @@ function CardContainer({ name, card_id }: CardContainerProps) {
     const deleteCardById = useDeleteCard();
     const createTask = useCreateTaskWithInCard();
     const deleteTask = useDeleteTask();
+
+    const listActionRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleOutsideClick = (event: MouseEvent) => {
+            if (listActionRef.current && !listActionRef.current.contains(event.target as Node)) {
+                setOpenSetting(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleOutsideClick);
+        return () => { document.removeEventListener('mousedown', handleOutsideClick) };
+    }, []);
+
 
     const handleCreateTask = (name: string, description: string) => {
         createTask.mutate({ name: name, description: description, card_id, board_id: id as string }, {
@@ -46,8 +59,6 @@ function CardContainer({ name, card_id }: CardContainerProps) {
         })
     }
 
-
-
     const handleDeleteCard = () => {
         deleteCardById.mutate({ id: card_id, board_id: id as string }, {
             onSuccess: () => {
@@ -63,12 +74,12 @@ function CardContainer({ name, card_id }: CardContainerProps) {
                 <div className='flex items-center justify-between mb-2'>
                     <h3 className="font-bold text-gray-200 text-sm">{name}</h3>
                     <div className='relative'>
-                        <button onClick={() => setOpenSetting(!openSetting)} className='text-white cursor-pointer rounded-full hover:bg-gray-600 p-1'>
+                        <button onClick={() => setOpenSetting(true)} className='text-white cursor-pointer rounded-full hover:bg-gray-600 p-1'>
                             <BiMenu size={18} />
                         </button>
 
                         {openSetting && (
-                            <div className='absolute bg-gray-600 text-white min-w-[200px] rounded-sm'>
+                            <div ref={listActionRef} className='absolute bg-gray-600 text-white min-w-[200px] rounded-sm'>
                                 <div className='flex justify-center p-2'>
                                     <span className='text-center'>List Actions</span>
                                     <button onClick={() => setOpenSetting(false)} className='absolute top-0 right-0 p-2 rounded-sm mr-1 mt-1 hover:bg-gray-400 cursor-pointer'><FaTimes /></button>
