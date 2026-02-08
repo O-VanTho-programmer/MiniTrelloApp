@@ -26,7 +26,7 @@ export default function BoardsManagementPage() {
     { isError && <div>Error: {error?.message}</div> }
 
     return (
-        <div className="flex min-h-screen w-full mt-10">
+        <div className="flex min-h-screen w-full mt-10 px-10 gap-6">
             <NavSideWorkPlace />
 
             <main className="flex-1">
