@@ -112,7 +112,9 @@ class Task {
             throw new Error('Task not found');
         }
 
-        return task.data().member_ids;
+        let memberIds = task.data().member_ids;
+
+        return memberIds;
     }
 
     static async unassignMember(taskId, memberId) {

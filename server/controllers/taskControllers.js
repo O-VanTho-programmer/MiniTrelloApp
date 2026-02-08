@@ -44,9 +44,9 @@ exports.getTaskByIdWithInCard = async (req, res) => {
 exports.updateTaskWithInCard = async (req, res) => {
     try {
         const taskId = req.params.taskId;
-        const { name, description } = req.body;
+        const { name, description, status } = req.body;
 
-        const task = await Task.updateWithInCard(taskId, { name, description });
+        const task = await Task.updateWithInCard(taskId, { name, description, status });
 
         res.status(200).json(task);
     } catch (error) {
@@ -70,7 +70,7 @@ exports.deleteTaskWithInCard = async (req, res) => {
 
 exports.assignMemberToTaskWithInCard = async (req, res) => {
     try {
-        const memberId = req.body;
+        const {memberId} = req.body;
         const taskId = req.params.taskId;
 
         const task = await Task.assignMember(taskId, memberId)
@@ -89,6 +89,8 @@ exports.unassignMemberToTaskWithInCard = async (req, res) => {
 
         const task = await Task.unassignMember(taskId, memberId);
 
+        if(!task) throw new Error("Error unassign member");
+
         res.status(204).json();
     } catch (error) {
         console.error("Error unassign member to task with in card", error);
@@ -106,7 +108,7 @@ exports.getAssignedMembersOfTaskWithInCard = async (req, res) => {
 
         res.status(200).json({
             task_id: taskId,
-            members
+            members: members
         });
     } catch (error) {
         console.error("Error get assigned members", error);

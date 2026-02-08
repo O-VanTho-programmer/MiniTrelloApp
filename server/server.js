@@ -23,6 +23,26 @@ app.use(express.json());
 
 io.on('connection', (socket) => {
     console.log('a user connected:', socket.id);
+
+    socket.on('join_board', (boardId) => {
+        socket.join(boardId);
+        console.log(`User ${socket.id} joined board ${boardId}`);
+    })
+
+    socket.on('leave_board', (boardId) => {
+        socket.leave(boardId);
+        console.log(`User ${socket.id} left board ${boardId}`);
+    })
+
+    socket.on('task_move', (boardId) => {
+        socket.to(boardId).emit('task_move');
+        console.log(`User ${socket.id} move task in board ${boardId}`);
+    })
+
+    socket.on('update_task', ({boardId, cardId}) => {
+        socket.to(boardId).emit('update_task', cardId);
+        console.log(`User ${socket.id} update task in board ${boardId}`);
+    })
 });
 
 // API Routes

@@ -134,7 +134,8 @@ function CardContainer({ name, card_id }: CardContainerProps) {
             {
                 selectedTask && (
                     <TaskDetailModal
-                        card_id={card_id}
+                        cardName={name}
+                        cardId={card_id}
                         task={selectedTask}
                         isOpen={selectedTask !== null}
                         onDelete={() => handleDeleteTask(selectedTask.id)}

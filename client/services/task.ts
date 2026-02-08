@@ -17,8 +17,8 @@ export const getTaskById = async (id: string, card_id: string, board_id: string)
     return data;
 }
 
-export const updateTask = async (id: string, name: string, description: string, card_id: string, board_id: string) => {
-    const { data } = await instance.put(`/boards/${board_id}/cards/${card_id}/tasks/${id}`, { name, description });
+export const updateTask = async (id: string, name: string, description: string, status: string, card_id: string, board_id: string) => {
+    const { data } = await instance.put(`/boards/${board_id}/cards/${card_id}/tasks/${id}`, { name, description, status });
 
     return data;
 }
@@ -30,7 +30,7 @@ export const deleteTask = async (id: string, card_id: string, board_id: string) 
 }
 
 export const assignMemberToTask = async (id: string, member_id: string, card_id: string, board_id: string) => {
-    const { data } = await instance.post(`/boards/${board_id}/cards/${card_id}/tasks/${id}/assign`, { member_id });
+    const { data } = await instance.post(`/boards/${board_id}/cards/${card_id}/tasks/${id}/assign`, { memberId: member_id });
 
     return data;
 }

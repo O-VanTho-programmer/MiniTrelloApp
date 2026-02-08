@@ -11,18 +11,19 @@ import { useGetAssignedMemberFromTask } from '@/hooks/useTasks';
 
 type TaskDetailModalProps = {
     task: Task
-    card_id: string
+    cardName: string
+    cardId: string
     isOpen: boolean;
     onDelete: (taskId: string) => void;
     onClose: () => void;
 };
 
-export default function TaskDetailModal({ isOpen, card_id, task, onDelete, onClose }: TaskDetailModalProps) {
+export default function TaskDetailModal({ isOpen, cardName, cardId, task, onDelete, onClose }: TaskDetailModalProps) {
     if (!isOpen) return null;
 
     const { id } = useParams(); //boardid
     const { data: membersInBoard, isLoading } = useGetMembers(id as string);
-    const { data: membersWithTaskId } = useGetAssignedMemberFromTask(task.id, card_id, id as string);
+    const { data: membersWithTaskId } = useGetAssignedMemberFromTask(task.id, cardId, id as string);
 
     const members = useMemo(() => {
         if (!membersWithTaskId) return [];
@@ -57,9 +58,9 @@ export default function TaskDetailModal({ isOpen, card_id, task, onDelete, onClo
                     <div className="flex gap-4">
                         <div className="pt-1 text-gray-400"><FaRegCreditCard size={20} /></div>
                         <div className="w-full">
-                            <h2 className="text-xl font-semibold text-gray-100 mb-1">Project planning</h2>
+                            <h2 className="text-xl font-semibold text-gray-100 mb-1">{task.name}</h2>
                             <p className="text-sm text-gray-400">
-                                in list To do
+                                in list {cardName}
                             </p>
                         </div>
                     </div>
@@ -138,6 +139,8 @@ export default function TaskDetailModal({ isOpen, card_id, task, onDelete, onClo
                                 {openMembersinBoard && (
                                     <div className='absolute'>
                                         <AddMemberModal
+                                            taskId={task.id}
+                                            cardId={cardId}
                                             members={membersInBoard || []}
                                             membersInTask={members || []}
                                             onClose={() => setOpenMembersinBoard(false)}

@@ -36,9 +36,24 @@ function BoardPage() {
     useEffect(() => {
         socket.connect();
 
+        socket.emit("join_board", id);
+
         socket.on("task_move", () => {
             queryClient.invalidateQueries({ queryKey: ["cards_by_board_id", id as string] });
         });
+
+        socket.on("update_task", (cardId: string) => {
+            console.log("update_task", cardId);
+            queryClient.invalidateQueries({ queryKey: ["cards_by_board_id", id as string] });
+
+        });
+
+        return () => {
+            socket.emit('leave_board', id as string);
+            socket.off('task_moved');
+            socket.off('update_task');
+            socket.disconnect();
+        };
     }, [id, queryClient])
 
     const handleCreateCard = (name: string) => {
@@ -147,7 +162,7 @@ function BoardPage() {
             }
         });
 
-        socket.emit("task_move")
+        socket.emit("task_move", id);
     }
 
     return (

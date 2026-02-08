@@ -1,4 +1,4 @@
-import { assignMemberToTask, createTaskWithInCard, deleteTask, dragAndDropMoveTask, getAssignedMemberFromTask, getTaskById, getTasksByCardId, updateTask } from "@/services/task"
+import { assignMemberToTask, createTaskWithInCard, deleteTask, dragAndDropMoveTask, getAssignedMemberFromTask, getTaskById, getTasksByCardId, unassignMemberFromTask, updateTask } from "@/services/task"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 export const useGetTasksByCardId = (card_id: string, board_id: string) => {
@@ -34,12 +34,12 @@ export const useGetTaskById = (id: string, card_id: string, board_id: string) =>
 export const useUpdateTask = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: ({ id, name, description, card_id, board_id }:
+        mutationFn: ({ id, name, description, status, card_id, board_id }:
             {
                 id: string, name: string,
-                description: string,
+                description: string, status: string,
                 card_id: string, board_id: string
-            }) => updateTask(id, name, description, card_id, board_id),
+            }) => updateTask(id, name, description,status, card_id, board_id),
         onSuccess: (_, { card_id }) => queryClient.invalidateQueries({ queryKey: ["tasks_by_card_id", card_id] })
     })
 }
@@ -80,7 +80,15 @@ export const useGetAssignedMemberFromTask = (id: string, card_id: string, board_
 }
 
 export const useUnassignMemberFromTask = () => {
-
+    const queryClient = useQueryClient();
+ 
+    return useMutation({
+        mutationFn: ({ id, card_id, board_id, member_id }: { id: string, card_id: string, board_id: string, member_id: string }) => {
+            return unassignMemberFromTask(id, card_id, board_id, member_id)
+        }, onSuccess: (_, {id}) => queryClient.invalidateQueries({
+            queryKey: ["assigned_member", id]
+        })
+    })
 }
 
 export const useDragAndDropMoveTask = () => {
