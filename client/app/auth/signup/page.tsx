@@ -2,7 +2,7 @@
 import Button from '@/app/components/ui/Button/Button';
 import { useSendCodeSignup, useSignUp } from '@/hooks/useAuth';
 import { useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react'
 
 

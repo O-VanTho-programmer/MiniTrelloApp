@@ -98,7 +98,7 @@ export default function AuthPage() {
                             isSaving={signin.isPending}
                             disabled={signin.isPending}
                             style='bg-black text-white justify-center'
-                            title="Sign Up"
+                            title="Sign In"
                             onClick={handleSignin} />
                     </>
                 )}

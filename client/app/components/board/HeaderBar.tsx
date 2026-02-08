@@ -69,8 +69,7 @@ function HeaderBar() {
         localStorage.removeItem('user');
         const queryClient = useQueryClient();
         queryClient.setQueryData(["user"], null);
-
-        window.location.href = '/auth';
+        router.push('/auth');
     }
 
     return (
