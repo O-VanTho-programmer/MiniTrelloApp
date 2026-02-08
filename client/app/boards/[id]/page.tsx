@@ -13,10 +13,13 @@ import InviteMember from '@/app/components/board/InviteMember';
 import { User } from '@/types/User';
 import { getUserByEmailSearch } from '@/services/auth';
 import { DragDropContext } from '@hello-pangea/dnd';
+import { useQueryClient } from '@tanstack/react-query';
+import { Task } from '@/types/Task';
 
 function BoardPage() {
     const { id } = useParams();
     const router = useRouter();
+    const queryClient = useQueryClient();
 
     const { data: membersInBoard } = useGetMembers(id as string);
     const { data: cards, isLoading: isLoadingCards, isError: isErrorCards, error: errorCards } = useGetCardsByBoardId(id as string);
@@ -86,10 +89,43 @@ function BoardPage() {
     };
 
     const handleDragEnd = (result: any) => {
-        const { destination, source, draggableId } = result;
+        const { destination, source, draggableId: taskId } = result;
         console.log(result);
         if (!destination) return;
 
+        const sourceCardId = source.droppableId;
+        const prevIndexOfTask = source.index;
+
+        const destinationCardId = destination.droppableId;
+        const newIndexOfTask = destination.index;
+
+        if (sourceCardId === destinationCardId) {
+            if (prevIndexOfTask !== newIndexOfTask) {
+                const tasksInCard = queryClient.getQueryData<Task[]>(['tasks_by_card_id', sourceCardId]) || [];
+
+                let newTasksInCard = [...tasksInCard];
+
+                const taskInPrevIndex = tasksInCard[prevIndexOfTask];
+                newTasksInCard.splice(prevIndexOfTask, 1);
+                newTasksInCard.splice(newIndexOfTask, 0, taskInPrevIndex);
+
+                queryClient.setQueryData(['tasks_by_card_id', sourceCardId], newTasksInCard);
+            }
+        } else {
+            const tasksInSourceCard = queryClient.getQueryData<Task[]>(['tasks_by_card_id', sourceCardId]) || [];
+            const tasksInDesCard = queryClient.getQueryData<Task[]>(['tasks_by_card_id', destinationCardId]) || [];
+
+            let newTasksInSourceCard = [...tasksInSourceCard];
+            let newTasksInDesCard = [...tasksInDesCard];
+
+            const taskInPrevIndex = tasksInSourceCard[prevIndexOfTask];
+            newTasksInSourceCard.splice(prevIndexOfTask, 1);
+
+            newTasksInDesCard.splice(newIndexOfTask, 0, taskInPrevIndex);
+
+            queryClient.setQueryData(['tasks_by_card_id', sourceCardId], newTasksInSourceCard);
+            queryClient.setQueryData(['tasks_by_card_id', destinationCardId], newTasksInDesCard);
+        }
     }
 
     return (

@@ -19,7 +19,9 @@ exports.createTaskWithInCard = async (req, res) => {
         const { name, description } = req.body;
         const userId = req.user.id;
 
-        const task = await Task.createWithInCard(cardId, boardId, name, description, userId);
+        console.log(name, description, cardId, boardId, userId);
+
+        const task = await Task.createWithInCard(cardId, boardId, userId, name, description);
         res.status(201).json(task);
     } catch (error) {
         console.error("Error create task with in card", error);
@@ -106,7 +108,7 @@ exports.getAssignedMembersOfTaskWithInCard = async (req, res) => {
             task_id: taskId,
             members
         });
-    } catch (error) {   
+    } catch (error) {
         console.error("Error get assigned members", error);
         res.status(500).json({ error: "Error" });
     }

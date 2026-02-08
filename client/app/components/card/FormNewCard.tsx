@@ -31,9 +31,7 @@ function FormNewCard({
         if (name.trim().length > 0) {
             onSubmit(name, description);
         } else {
-            setName('');
-            setDescription('');
-            onClose();
+            alert('Name is required')
         }
     }
 

@@ -32,6 +32,11 @@ export default function TaskDetailModal({ isOpen, card_id, task, onDelete, onClo
 
     const [openMembersinBoard, setOpenMembersinBoard] = useState<boolean>(false);
 
+    const handleDeleteTask = () => {
+        onDelete(task.id);
+        onClose();
+    }
+
     return (
         <div
             className="modal"
@@ -153,7 +158,7 @@ export default function TaskDetailModal({ isOpen, card_id, task, onDelete, onClo
 
                             <Button
                                 style="justify-start bg-gray-800 hover:bg-red-900/50 hover:text-red-400 text-gray-300 border-2 border-gray-400"
-                                icon={FaArchive} title="Archive" onClick={() => onDelete(task.id)}
+                                icon={FaArchive} title="Archive" onClick={handleDeleteTask}
                             />
 
                         </div>

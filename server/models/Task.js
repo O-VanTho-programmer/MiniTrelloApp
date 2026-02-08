@@ -48,7 +48,12 @@ class Task {
     }
 
     static async createWithInCard(cardId, boardId, ownerId, name, description) {
-        const maxOrderNumber = (await db.collection('tasks').where('card_id', '==', cardId).orderBy('order_number', 'desc').limit(1).get()).docs[0].data().order_number;
+        const maxOrderNumberSnap = await db.collection('tasks').where('card_id', '==', cardId).orderBy('order_number', 'desc').limit(1).get();
+        let maxOrderNumber = -1;
+
+        if (!maxOrderNumberSnap.empty) {
+            maxOrderNumber = maxOrderNumberSnap.docs[0].data().order_number;
+        }
 
         const dto = {
             name: name,
@@ -61,6 +66,8 @@ class Task {
             member_ids: [],
             create_at: new Date().toISOString()
         }
+
+        console.log(dto);
 
         const newTask = await db.collection('tasks').add(dto);
         return new Task(newTask.id, dto.name, dto.description, dto.card_id, dto.board_id, dto.order_number, dto.owner_id, dto.member_ids, dto.create_at);

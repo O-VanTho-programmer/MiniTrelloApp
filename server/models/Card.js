@@ -11,8 +11,12 @@ class Card {
   }
 
   static async create(name, description, board_id) {
-    
-    const maxOrderNumber = (await db.collection('cards').where('board_id', '==', board_id).orderBy('order_number', 'desc').limit(1).get()).docs[0].data().order_number;
+
+    const maxOrderNumberSnap = await db.collection('cards').where('board_id', '==', board_id).orderBy('order_number', 'desc').limit(1).get();
+    let maxOrderNumber = -1
+    if (!maxOrderNumberSnap.empty) {
+      maxOrderNumber = maxOrderNumberSnap.docs[0].data().order_number;
+    }
 
     const dto = {
       name: name,

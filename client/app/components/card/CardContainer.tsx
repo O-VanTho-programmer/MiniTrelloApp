@@ -33,6 +33,7 @@ function CardContainer({ name, card_id }: CardContainerProps) {
         createTask.mutate({ name: name, description: description, card_id, board_id: id as string }, {
             onSuccess: () => {
                 alert('Task created successfully');
+                setIsCreatingTask(false);
             }
         })
     }
