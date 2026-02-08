@@ -55,7 +55,7 @@ export default function TaskDetailModal({ isOpen, cardName, cardId, task, onDele
         >
             <div
                 onClick={(e) => e.stopPropagation()}
-                className="modal-content min-h-[650px]! relative max-w-3xl! bg-gray-900!">
+                className="modal-content min-h-[500px] md:min-h-[650px]! relative max-w-3xl! bg-gray-900!">
                 <button
                     onClick={onClose}
                     className="absolute cursor-pointer top-6 right-6 p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-full transition"

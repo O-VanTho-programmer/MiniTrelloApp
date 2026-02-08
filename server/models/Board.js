@@ -18,6 +18,7 @@ class Board {
             description: data.description || '',
             owner_id: data.owner_id,
             member_ids: data.member_ids || [data.owner_id],
+            is_active: true,
             create_at: new Date(),
         }
 
@@ -47,7 +48,7 @@ class Board {
     }
 
     static async getByUser(userId) {
-        const boards = await db.collection('boards').where('member_ids', 'array-contains', userId).where('is_active', '!=', false).get();
+        const boards = await db.collection('boards').where('member_ids', 'array-contains', userId).where('is_active', '!=', false).orderBy('create_at', 'desc').get();
 
         return boards.docs.map(board => {
             const data = board.data();

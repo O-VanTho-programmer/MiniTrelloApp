@@ -1,5 +1,7 @@
 const Board = require('../models/Board');
+const Card = require('../models/Card');
 const Invitation = require('../models/Invitation');
+const Task = require('../models/Task');
 const User = require('../models/User');
 const { transporter } = require('./authControllers');
 
@@ -14,6 +16,19 @@ exports.newBoard = async (req, res) => {
             owner_id: userId,
             member_ids: [userId]
         });
+
+        const sample = ["Todo", "Doing", "Done"];
+
+        for (const s of sample) {
+            const newCard = await Card.create(s, "", newBoard.id);
+
+            if (s === "Todo") {
+                await Task.createWithInCard(newCard.id, newBoard.id, userId, "Welcome to Mini Trello", "");
+                await Task.createWithInCard(newCard.id, newBoard.id, userId, "Drag this", "");
+            } else if (s === "Done") {
+                await Task.createWithInCard(newCard.id, newBoard.id, userId, "Challenge", "");
+            }
+        }
 
         res.status(201).json(newBoard);
 

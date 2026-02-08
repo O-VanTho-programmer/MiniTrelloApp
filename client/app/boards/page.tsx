@@ -6,9 +6,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { BsPlus } from "react-icons/bs";
 import ModalNewBoard from "../components/board/ModalNewBoard";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function BoardsManagementPage() {
     const { data: boards, isLoading, isError, error } = useGetBoardsByUser();
+    const queryClient = useQueryClient();
     const createBoard = useCreateBoard();
 
     const [openModal, setOpenModal] = useState(false);
@@ -17,7 +19,12 @@ export default function BoardsManagementPage() {
         createBoard.mutate({ name, description },
             {
                 onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["boardsByUser"] });
                     alert("Board created successfully");
+                    setOpenModal(false);
+                },
+                onError: () => {
+                    alert("Failed to create board");
                 }
             }
         );
@@ -63,6 +70,7 @@ export default function BoardsManagementPage() {
                     isOpen={openModal}
                     onClose={() => setOpenModal(false)}
                     onSubmit={handleCreateBoard}
+                    isCreating={createBoard.isPending}
                 />
             }
         </div>

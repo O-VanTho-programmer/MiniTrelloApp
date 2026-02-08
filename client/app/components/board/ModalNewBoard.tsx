@@ -6,9 +6,10 @@ type ModalNewBoardProps = {
     isOpen: boolean;
     onClose: () => void;
     onSubmit: (name: string, description: string) => void;
+    isCreating: boolean;
 }
 
-function ModalNewBoard({ isOpen, onClose, onSubmit }: ModalNewBoardProps) {
+function ModalNewBoard({ isOpen, onClose, onSubmit, isCreating }: ModalNewBoardProps) {
     if (!isOpen) {
         return null;
     }
@@ -62,6 +63,8 @@ function ModalNewBoard({ isOpen, onClose, onSubmit }: ModalNewBoardProps) {
                             title="Cancel"
                         />
                         <Button
+                            disabled={isCreating}
+                            isSaving={isCreating}
                             style='bg-blue-500 text-white hover:bg-blue-600'
                             onClick={handleSubmit}
                             title="Create Board"
