@@ -8,6 +8,8 @@ import Avatar from '../ui/Avatar';
 import { useMemo, useState } from 'react';
 import AddMemberModal from './AddMemberModal';
 import { useGetAssignedMemberFromTask } from '@/hooks/useTasks';
+import ListRepoModal from '../repository/ListRepoModal';
+import { getRepositoryById } from '@/services/githubRepo';
 
 type TaskDetailModalProps = {
     task: Task
@@ -32,10 +34,18 @@ export default function TaskDetailModal({ isOpen, cardName, cardId, task, onDele
     }, [membersWithTaskId])
 
     const [openMembersinBoard, setOpenMembersinBoard] = useState<boolean>(false);
+    const [isOpenRepoModal, setIsOpenRepoModal] = useState<boolean>(false);
 
     const handleDeleteTask = () => {
         onDelete(task.id);
         onClose();
+    }
+
+    const handleSelectRepo = async (repo: any) => {
+        
+        const getRepoById = await getRepositoryById(repo.id);
+        
+        console.log(getRepoById);
     }
 
     return (
@@ -152,11 +162,19 @@ export default function TaskDetailModal({ isOpen, cardName, cardId, task, onDele
                             <div>
                                 <span className="text-sm font-normal text-gray-500">Power-Ups</span>
                                 <Button
-                                    onClick={() => { }}
+                                    onClick={() => setIsOpenRepoModal(true)}
                                     style="justify-start bg-gray-800 hover:bg-gray-700 text-gray-300"
                                     icon={FaGithub}
                                     title="GitHub"
                                 />
+
+                                {isOpenRepoModal && (
+                                    <ListRepoModal
+                                        isOpen={isOpenRepoModal}
+                                        onClose={() => setIsOpenRepoModal(false)}
+                                        onSelectRepo={handleSelectRepo}
+                                    />
+                                )}
                             </div>
 
                             <Button

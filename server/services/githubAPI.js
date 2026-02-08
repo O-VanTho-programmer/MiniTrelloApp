@@ -1,20 +1,25 @@
 const User = require("../models/User");
-const { Octokit } = require("@octokit/rest");
 
 const getGithubAPI = async (userId) => {
     try {
-        const user = User.getById(userId);
+        const { Octokit } = await import("@octokit/rest");
+        const user = await User.getById(userId);
+
+        if (!user) throw new Error("User not found");
 
         const token = user.github_access_token;
 
-        if (!token) throw new Error("No token");
+        if (!token) throw new Error("No GitHub token found for this user");
 
-        const octoki = new Octokit({
+        const octokit = new Octokit({
             auth: token
-        })
+        });
 
-        return octoki;
+        return octokit;
     } catch (error) {
-        console.error("Error get github api", error);
+        console.error("Error getting GitHub API client:", error.message);
+        throw error;
     }
 }
+
+module.exports = getGithubAPI;

@@ -49,7 +49,7 @@ io.on('connection', (socket) => {
 app.use('/auth', require('./routes/auth'));
 app.use('/boards', require('./routes/boards'));
 app.use('/users', require('./routes/users'));
-
+app.use('/repositories', require('./routes/github'))
 
 
 

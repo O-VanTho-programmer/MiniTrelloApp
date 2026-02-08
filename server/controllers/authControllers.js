@@ -48,7 +48,7 @@ exports.githubLogin = async (req, res) => {
             email: gitHubUser.email,
             avatar_url: gitHubUser.avatar_url,
             provider: "github",
-            githubAccessToken: access_token, 
+            github_access_token: access_token, 
         }
 
         const token = jwt.sign(
