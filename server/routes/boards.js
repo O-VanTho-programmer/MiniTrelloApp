@@ -38,7 +38,7 @@ router.delete('/:boardId/cards/:id/tasks/:taskId', taskController.deleteTaskWith
 router.post('/:boardId/cards/:id/tasks/:taskId/assign', taskController.assignMemberToTaskWithInCard)
 router.get('/:boardId/cards/:id/tasks/:taskId/assign', taskController.getAssignedMembersOfTaskWithInCard)
 router.delete('/:boardId/cards/:id/tasks/:taskId/assign/:memberId', taskController.unassignMemberToTaskWithInCard)
-
+router.put('/tasks/:taskId/move', taskController.dragAndDropMove)
 
 
 module.exports = router;

@@ -122,6 +122,53 @@ class Task {
 
         return true;
     }
+
+    static async dragAndDropMove(taskId, sourceCard, desCard, newIndex) {
+        const transaction = db.batch();
+
+        if (sourceCard === desCard) {
+            const tasksInCardSnap = await db.collection('tasks').where('card_id', '==', sourceCard).orderBy('order_number', 'asc').get();
+            const tasksInCard = tasksInCardSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+            const movedTask = tasksInCard.find(task => task.id === taskId);
+
+            tasksInCard.splice(tasksInCard.indexOf(movedTask), 1);
+            tasksInCard.splice(newIndex, 0, movedTask);
+
+            tasksInCard.forEach((task, index) => {
+                transaction.update(db.collection('tasks').doc(task.id), { order_number: index });
+            });
+        } else {
+
+            const [tasksInSourceCardSnap, tasksInDesCardSnap] = await Promise.all([
+                db.collection('tasks').where('card_id', '==', sourceCard).orderBy('order_number', 'asc').get(),
+                db.collection('tasks').where('card_id', '==', desCard).orderBy('order_number', 'asc').get()
+            ])
+
+            const tasksInSourceCard = tasksInSourceCardSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const tasksInDesCard = tasksInDesCardSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+            const movedTask = tasksInSourceCard.find(task => task.id === taskId);
+            tasksInSourceCard.splice(tasksInSourceCard.indexOf(movedTask), 1);
+            tasksInDesCard.splice(newIndex, 0, movedTask);
+
+
+            tasksInSourceCard.forEach((task, index) => {
+                transaction.update(db.collection('tasks').doc(task.id), { order_number: index });
+            })
+
+            tasksInDesCard.forEach((task, index) => {
+                const update = { order_number: index };
+                if (task.id === movedTask.id) {
+                    update.card_id = desCard;
+                }
+                transaction.update(db.collection('tasks').doc(task.id), update);
+            });
+        }
+
+        await transaction.commit();
+        return true;
+    }
 }
 
 module.exports = Task;

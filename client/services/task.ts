@@ -46,3 +46,9 @@ export const unassignMemberFromTask = async (id: string, card_id: string, board_
 
     return data;
 }
+
+export const dragAndDropMoveTask = async (id: string, sourceCardId: string, destinationCardId: string, newIndex: number) => {
+    const { data } = await instance.put(`/boards/tasks/${id}/move`, { sourceCardId, destinationCardId, newIndex });
+
+    return data;
+}

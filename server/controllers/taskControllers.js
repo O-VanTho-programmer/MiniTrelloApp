@@ -113,3 +113,16 @@ exports.getAssignedMembersOfTaskWithInCard = async (req, res) => {
         res.status(500).json({ error: "Error" });
     }
 }
+
+exports.dragAndDropMove = async (req, res) => {
+    try {
+        const taskId = req.params.taskId;
+        const { sourceCardId, destinationCardId, newIndex } = req.body;
+        const task = await Task.dragAndDropMove(taskId, sourceCardId, destinationCardId, newIndex);
+
+        res.status(200).json(task);
+    } catch (error) {
+        console.error("Error drag and drop move", error);
+        res.status(500).json({ error: "Error drag and drop move" });
+    }
+}

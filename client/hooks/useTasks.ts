@@ -1,4 +1,4 @@
-import { assignMemberToTask, createTaskWithInCard, deleteTask, getAssignedMemberFromTask, getTaskById, getTasksByCardId, updateTask } from "@/services/task"
+import { assignMemberToTask, createTaskWithInCard, deleteTask, dragAndDropMoveTask, getAssignedMemberFromTask, getTaskById, getTasksByCardId, updateTask } from "@/services/task"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 export const useGetTasksByCardId = (card_id: string, board_id: string) => {
@@ -81,4 +81,14 @@ export const useGetAssignedMemberFromTask = (id: string, card_id: string, board_
 
 export const useUnassignMemberFromTask = () => {
 
+}
+
+export const useDragAndDropMoveTask = () => {
+    return useMutation({
+        mutationFn: ({ id, sourceCardId, destinationCardId, newIndex }:
+            {
+                id: string, sourceCardId: string,
+                destinationCardId: string, newIndex: number
+            }) => dragAndDropMoveTask(id, sourceCardId, destinationCardId, newIndex),
+    })
 }

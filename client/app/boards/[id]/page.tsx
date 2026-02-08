@@ -15,6 +15,7 @@ import { getUserByEmailSearch } from '@/services/auth';
 import { DragDropContext } from '@hello-pangea/dnd';
 import { useQueryClient } from '@tanstack/react-query';
 import { Task } from '@/types/Task';
+import { useDragAndDropMoveTask } from '@/hooks/useTasks';
 
 function BoardPage() {
     const { id } = useParams();
@@ -88,10 +89,15 @@ function BoardPage() {
         }
     };
 
+    const moveTask = useDragAndDropMoveTask();
+
     const handleDragEnd = (result: any) => {
         const { destination, source, draggableId: taskId } = result;
         console.log(result);
+
         if (!destination) return;
+
+
 
         const sourceCardId = source.droppableId;
         const prevIndexOfTask = source.index;
@@ -126,6 +132,15 @@ function BoardPage() {
             queryClient.setQueryData(['tasks_by_card_id', sourceCardId], newTasksInSourceCard);
             queryClient.setQueryData(['tasks_by_card_id', destinationCardId], newTasksInDesCard);
         }
+
+        moveTask.mutate({ id: taskId, sourceCardId, destinationCardId, newIndex: newIndexOfTask }, {
+            onSuccess: () => {
+                console.log('Task moved successfully');
+            },
+            onError: (error) => {
+                console.error('Error moving task:', error);
+            }
+        });
     }
 
     return (
