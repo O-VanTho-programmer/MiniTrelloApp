@@ -74,7 +74,9 @@ function CardContainer({ name, card_id }: CardContainerProps) {
                                     <button onClick={() => setOpenSetting(false)} className='absolute top-0 right-0 p-2 rounded-sm mr-1 mt-1 hover:bg-gray-400 cursor-pointer'><FaTimes /></button>
                                 </div>
                                 <ul>
-                                    <li className='py-2 px-2 hover:bg-gray-400 cursor-pointer'>Add Task</li>
+                                    <li
+                                        onClick={() => setIsCreatingTask(true)}
+                                        className='py-2 px-2 hover:bg-gray-400 cursor-pointer'>Add Task</li>
                                     <li onClick={handleDeleteCard} className='py-2 px-2 hover:bg-gray-400 cursor-pointer'>Delete</li>
                                 </ul>
                             </div>
