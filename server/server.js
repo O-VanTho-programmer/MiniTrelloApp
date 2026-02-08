@@ -34,13 +34,13 @@ io.on('connection', (socket) => {
         console.log(`User ${socket.id} left board ${boardId}`);
     })
 
-    socket.on('task_move', (boardId) => {
-        socket.to(boardId).emit('task_move');
+    socket.on('task_move', ({ boardId, taskId, sourceCardId, destCardId, prevIndex, newIndex }) => {
+        socket.to(boardId).emit('task_move', { taskId, sourceCardId, destCardId, prevIndex, newIndex });
         console.log(`User ${socket.id} move task in board ${boardId}`);
     })
 
-    socket.on('update_task', ({boardId, cardId}) => {
-        socket.to(boardId).emit('update_task', cardId);
+    socket.on('update_task', ({ boardId, cardId, taskId, status }) => {
+        socket.to(boardId).emit("update_task", { cardId, taskId, status });
         console.log(`User ${socket.id} update task in board ${boardId}`);
     })
 });

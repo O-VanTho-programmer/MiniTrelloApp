@@ -38,23 +38,41 @@ function BoardPage() {
 
         socket.emit("join_board", id);
 
-        socket.on("task_move", () => {
-            queryClient.invalidateQueries({ queryKey: ["cards_by_board_id", id as string] });
+        socket.on("task_move", ({ taskId, sourceCardId, destCardId, prevIndex, newIndex }) => {
+            const sourceTasks = queryClient.getQueryData<Task[]>(['tasks_by_card_id', sourceCardId]) || [];
+            const destTasks = sourceCardId === destCardId ? (sourceTasks)
+                : (queryClient.getQueryData<Task[]>(['tasks_by_card_id', destCardId]) || []);
+
+            let newTasksInSourceCard = [...sourceTasks];
+            let newTasksInDesCard = [...destTasks];
+
+            const movedTaskIndex = newTasksInSourceCard.findIndex(task => task.id === taskId);
+
+            const movedTask = newTasksInSourceCard[movedTaskIndex];
+            newTasksInSourceCard.splice(movedTaskIndex, 1);
+            newTasksInDesCard.splice(newIndex, 0, movedTask);
+
+            queryClient.setQueryData(['tasks_by_card_id', sourceCardId], newTasksInSourceCard);
+            if (sourceCardId !== destCardId) queryClient.setQueryData(['tasks_by_card_id', destCardId], newTasksInDesCard);
         });
 
-        socket.on("update_task", (cardId: string) => {
-            console.log("update_task", cardId);
-            queryClient.invalidateQueries({ queryKey: ["cards_by_board_id", id as string] });
+        socket.on("update_task", ({ cardId, taskId, status }) => {
 
+            queryClient.setQueryData(['tasks_by_card_id', cardId], (oldTasks: Task[]) => {
+                if (!oldTasks) return oldTasks;
+                return oldTasks.map(task =>
+                    task.id === taskId ? { ...task, status: status } : task
+                );
+            });
         });
 
         return () => {
             socket.emit('leave_board', id as string);
-            socket.off('task_moved');
+            socket.off('task_move');
             socket.off('update_task');
             socket.disconnect();
         };
-    }, [id, queryClient])
+    }, [id])
 
     const handleCreateCard = (name: string) => {
         if (!confirm("Are you sure you want to close this board?")) return;
@@ -162,7 +180,7 @@ function BoardPage() {
             }
         });
 
-        socket.emit("task_move", id);
+        socket.emit("task_move", { boardId: id as string, taskId, sourceCardId, destCardId: destinationCardId, prevIndex: prevIndexOfTask, newIndex: newIndexOfTask });
     }
 
     return (

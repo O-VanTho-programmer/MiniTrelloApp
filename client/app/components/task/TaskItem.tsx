@@ -2,7 +2,7 @@ import { useUpdateTask } from '@/hooks/useTasks';
 import { socket } from '@/lib/socket';
 import { Task } from '@/types/Task'
 import { useParams } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BiCheck } from 'react-icons/bi';
 
 type TaskItemProps = {
@@ -14,6 +14,11 @@ function TaskItem({ item }: TaskItemProps) {
   const [isDone, setIsDone] = useState(item.status === 'Done');
   const updateTask = useUpdateTask();
 
+  useEffect(() => {
+    setIsDone(item.status === 'Done');
+  }, [item.status])
+
+
   const handleToggleDone = () => {
     setIsDone(!isDone);
 
@@ -24,7 +29,12 @@ function TaskItem({ item }: TaskItemProps) {
         card_id: item.card_id, board_id: board_id as string
       }, {
       onSuccess: () => {
-        socket.emit("update_task", {boardId: board_id, cardId: item.card_id});
+        socket.emit("update_task", {
+          boardId: board_id,
+          cardId: item.card_id,
+          taskId: item.id,
+          status: isDone ? "Pending" : "Done"
+        });
       },
       onError: () => {
         setIsDone(!isDone);
