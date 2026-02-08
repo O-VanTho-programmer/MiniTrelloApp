@@ -167,7 +167,7 @@ The project is separated into **Client** and **Server** folders.
 ![workplace](./screenshot/workplace_boards.png)
 
 ### New Board
-![newboard](./screenshot/workplace_boards.png)
+![newboard](./screenshot/create_new_board.png)
 
 ### Board Page
 ![board](./screenshot/board.png)
@@ -178,8 +178,10 @@ The project is separated into **Client** and **Server** folders.
 ### New Task
 ![newtask](./screenshot/new_task.png)
 
-### Drag and Drop
+## Drag and Drop
+### Drag and Drop in User A
 ![dragndrop](./screenshot/drag&drop.png)
+### Update real-time in User B
 ![update_realtime](./screenshot/update_realtime_in_otheraccount.png)
 
 ### Detail Task and Assigned Members
@@ -194,3 +196,8 @@ The project is separated into **Client** and **Server** folders.
 ### Responed Invitation
 ![get_invite](./screenshot/get_invite_accept.png)
 
+### Get Repositories From GitHub
+![repos](./screenshot/get_repos.png)
+
+### Display All GitHub Information for a Repository
+![repos](./screenshot/get_repository_detail.png)
