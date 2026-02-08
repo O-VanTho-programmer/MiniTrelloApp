@@ -27,7 +27,7 @@ exports.githubLogin = async (req, res) => {
                 "Accept": "application/json"
             }
         })
-
+        
         const access_token = respone.data.access_token;
 
         if (!access_token) {
@@ -47,7 +47,8 @@ exports.githubLogin = async (req, res) => {
             name: gitHubUser.name,
             email: gitHubUser.email,
             avatar_url: gitHubUser.avatar_url,
-            provider: "github"
+            provider: "github",
+            githubAccessToken: access_token, 
         }
 
         const token = jwt.sign(

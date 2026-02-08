@@ -10,9 +10,9 @@ import CardContainer from '@/app/components/card/CardContainer';
 import { useGetMembers, useUpdateStatusBoard } from '@/hooks/useBoards';
 import { useSendInvitation } from '@/hooks/useInvitation';
 import InviteMember from '@/app/components/board/InviteMember';
-import { useGetUserByEmailSearch } from '@/hooks/useAuth';
 import { User } from '@/types/User';
 import { getUserByEmailSearch } from '@/services/auth';
+import { DragDropContext } from '@hello-pangea/dnd';
 
 function BoardPage() {
     const { id } = useParams();
@@ -85,6 +85,13 @@ function BoardPage() {
         }
     };
 
+    const handleDragEnd = (result: any) => {
+        const { destination, source, draggableId } = result;
+        console.log(result);
+        if (!destination) return;
+
+    }
+
     return (
         <div className='flex'>
             <SideBoard
@@ -102,31 +109,33 @@ function BoardPage() {
                 </header>
 
                 <main className="flex-1 overflow-x-auto overflow-y-hidden h-full bg-white p-6">
-                    <div className="flex items-start gap-6 h-full">
+                    <DragDropContext onDragEnd={handleDragEnd}>
+                        <div className="flex items-start gap-6 h-full">
 
-                        {cards?.map((card, index) => (
-                            <CardContainer key={index} name={card.name} card_id={card.id} />
-                        ))}
+                            {cards?.map((card, index) => (
+                                <CardContainer key={index} name={card.name} card_id={card.id} />
+                            ))}
 
-                        <div className="min-w-[200px] max-w-72 transition-all duration-200">
-                            {isCreatingList ? (
-                                <FormNewList isOpen={isCreatingList}
-                                    onClose={() => setIsCreatingList(false)}
-                                    onSubmit={handleCreateCard}
-                                    title='Add Card' />
-                            ) : (
-                                <button
-                                    onClick={() => setIsCreatingList(true)}
-                                    disabled={createCard.isPending}
-                                    className="w-full cursor-pointer flex items-center gap-2 bg-pink-600 hover:bg-pink-700 text-white px-4 py-3 rounded-xl shadow-md transition font-medium text-sm text-left"
-                                >
-                                    {!createCard.isPending && <FaPlus />}
-                                    {createCard.isPending ? "Creating..." : "Add a card"}
-                                </button>
-                            )}
+                            <div className="min-w-[200px] max-w-72 transition-all duration-200">
+                                {isCreatingList ? (
+                                    <FormNewList isOpen={isCreatingList}
+                                        onClose={() => setIsCreatingList(false)}
+                                        onSubmit={handleCreateCard}
+                                        title='Add Card' />
+                                ) : (
+                                    <button
+                                        onClick={() => setIsCreatingList(true)}
+                                        disabled={createCard.isPending}
+                                        className="w-full cursor-pointer flex items-center gap-2 bg-pink-600 hover:bg-pink-700 text-white px-4 py-3 rounded-xl shadow-md transition font-medium text-sm text-left"
+                                    >
+                                        {!createCard.isPending && <FaPlus />}
+                                        {createCard.isPending ? "Creating..." : "Add a card"}
+                                    </button>
+                                )}
+                            </div>
+
                         </div>
-
-                    </div>
+                    </DragDropContext>
                 </main>
             </section>
 

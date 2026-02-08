@@ -8,6 +8,7 @@ import { useCreateTaskWithInCard, useDeleteTask, useGetTasksByCardId } from '@/h
 import TaskItem from '../task/TaskItem'
 import { TaskWithAssignedMember } from '@/types/Task'
 import TaskDetailModal from '../task/TaskDetailModal'
+import { Draggable, Droppable } from '@hello-pangea/dnd'
 
 type CardContainerProps = {
     name: string
@@ -80,13 +81,36 @@ function CardContainer({ name, card_id }: CardContainerProps) {
                     </div>
                 </div>
 
-                <div className="max-h-[70vh] overflow-y-auto flex flex-col gap-2">
-                    {tasks?.map((task, idx) => (
-                        <div onClick={() => setSelectedTask(task)} key={idx} className='cursor-pointer mb-2'>
-                            <TaskItem key={idx} item={task} />
+                <Droppable droppableId={card_id} type="TASK">
+                    {(provided, snapshot) => (
+                        <div
+                            ref={provided.innerRef}
+                            {...provided.droppableProps}
+                            className={`flex-1 overflow-y-auto p-2 min-h-[10px] rounded-md transition-colors ${snapshot.isDraggingOver ? 'bg-gray-500' : ''
+                                }`}
+                        >
+                            <div className="flex flex-col gap-2">
+                                {tasks?.map((task, idx) => (
+                                    <Draggable key={task.id} draggableId={task.id} index={idx}>
+                                        {(provided, snapshot) => (
+                                            <div
+                                                ref={provided.innerRef}
+                                                {...provided.draggableProps}
+                                                {...provided.dragHandleProps}
+                                                onClick={() => setSelectedTask(task)}
+                                                style={{ ...provided.draggableProps.style }}
+                                                className={`${snapshot.isDragging ? 'rotate-2 shadow-xl ring-2 ring-blue-400 z-50 rounded-md' : ''}`}
+                                            >
+                                                <TaskItem item={task} />
+                                            </div>
+                                        )}
+                                    </Draggable>
+                                ))}
+                                {provided.placeholder}
+                            </div>
                         </div>
-                    ))}
-                </div>
+                    )}
+                </Droppable>
 
 
                 <div className='w-full'>
@@ -105,19 +129,19 @@ function CardContainer({ name, card_id }: CardContainerProps) {
                         </button>
                     )}
                 </div>
-
             </div>
-
-            {selectedTask && (
-                <TaskDetailModal
-                    card_id={card_id}
-                    task={selectedTask}
-                    isOpen={selectedTask !== null}
-                    onDelete={() => handleDeleteTask(selectedTask.id)}
-                    onClose={() => setSelectedTask(null)}
-                />
-            )}
-        </div>
+            {
+                selectedTask && (
+                    <TaskDetailModal
+                        card_id={card_id}
+                        task={selectedTask}
+                        isOpen={selectedTask !== null}
+                        onDelete={() => handleDeleteTask(selectedTask.id)}
+                        onClose={() => setSelectedTask(null)}
+                    />
+                )
+            }
+        </div >
     )
 }
 

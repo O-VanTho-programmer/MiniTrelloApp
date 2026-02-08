@@ -35,7 +35,7 @@ export default function AuthPage({ }) {
             onSuccess: () => {
                 alert("Code sent successfully");
                 setOpenVerifyCode(true);
-            }
+            },
         })
     }
 
@@ -51,7 +51,9 @@ export default function AuthPage({ }) {
                 const queryClient = useQueryClient();
                 queryClient.invalidateQueries({ queryKey: ["user"] });
 
-                // router.push("/boards");
+                router.push("/boards");
+            }, onError: () => {
+                alert("Invalid code");
             }
         })
     }

@@ -26,17 +26,15 @@ function Button({
 
     return (
         <button disabled={disabled} type="button" className={`${style || ''} disabled:bg-gray-500 disabled:text-gray-700 cursor-pointer py-2 px-4 rounded-sm flex justify-between items-center gap-2`} onClick={onClick}>
+
             {isSaving ? (
-                <>
-                    <FaSpinner className="animate-spin text-4xl mb-4" />
-                    <span>Saving...</span>
-                </>
+                <FaSpinner size={iconSize} className="animate-spin" />
             ) : (
-                <>
-                    {Icon && <Icon size={iconSize} />}
-                    <span>{title}</span>
-                </>
+                <>{Icon && <Icon size={iconSize} />}</>
             )}
+
+            <span>{isSaving ? 'Saving...' : title}</span>
+
         </button>
     )
 }
