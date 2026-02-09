@@ -4,6 +4,8 @@ const authenticateToken = require('../middleware');
 const boardController = require('../controllers/boardControllers');
 const cardController = require('../controllers/cardControllers');
 const taskController = require('../controllers/taskControllers');
+const githubController = require('../controllers/githubRepoControllers');
+
 
 router.use(authenticateToken);
 
@@ -17,8 +19,8 @@ router.get('/:id/members', boardController.getMembers);
 router.post('/:id/members', boardController.addMemberToBoard)
 
 // Invite
-router.post('/:id/invite', boardController.sendInvite)
-router.post('/invite-respone/:inviteId', boardController.responeInvite)
+router.post('/:id/invite', boardController.sendInvite);
+router.post('/invite-respone/:inviteId', boardController.responeInvite);
 router.put('/:id', boardController.updateBoard);
 router.delete('/:id', boardController.deleteBoard);
 router.delete('/invite/:inviteId', boardController.deleteInvitation);
@@ -28,7 +30,7 @@ router.delete('/invite/:inviteId', boardController.deleteInvitation);
 router.post('/:boardId/cards', cardController.newCard); //
 router.get('/:boardId/cards', cardController.getAllCards); //
 router.get('/:boardId/cards/:id', cardController.getCardById);
-router.get('/:boardId/cards/user/:user_id', cardController.getCardsByUser)
+router.get('/:boardId/cards/user/:user_id', cardController.getCardsByUser);
 router.put('/:boardId/cards/:id', cardController.updateCard);
 router.delete('/:boardId/cards/:id', cardController.deleteCard);//
 
@@ -42,6 +44,11 @@ router.post('/:boardId/cards/:id/tasks/:taskId/assign', taskController.assignMem
 router.get('/:boardId/cards/:id/tasks/:taskId/assign', taskController.getAssignedMembersOfTaskWithInCard)
 router.delete('/:boardId/cards/:id/tasks/:taskId/assign/:memberId', taskController.unassignMemberToTaskWithInCard)
 router.put('/tasks/:taskId/move', taskController.dragAndDropMove)
+
+// Github Attachment 
+router.post('/:boardId/cards/:cardId/tasks/:taskId/github-attach', githubController.attachGithub);
+router.get('/:boardId/cards/:cardId/tasks/:taskId/github-attachments', githubController.getGithubAttachments);
+router.delete('/:boardId/cards/:cardId/tasks/:taskId/github-attachments/:attachmentId', githubController.deleteGithubAttachment);
 
 
 module.exports = router;

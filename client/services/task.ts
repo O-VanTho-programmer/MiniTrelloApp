@@ -1,4 +1,5 @@
 import instance from "@/lib/axios"
+import { Attachment } from "@/types/GithubRepo";
 import { Task, TaskWithAssignedMember } from "@/types/Task";
 
 export const getTasksByCardId = async (card_id: string, board_id: string): Promise<Task[]> => {
@@ -49,6 +50,20 @@ export const unassignMemberFromTask = async (id: string, card_id: string, board_
 
 export const dragAndDropMoveTask = async (id: string, sourceCardId: string, destinationCardId: string, newIndex: number) => {
     const { data } = await instance.put(`/boards/tasks/${id}/move`, { sourceCardId, destinationCardId, newIndex });
+    return data;
+}
 
+export const getAttachmentsByTaskId = async (id: string, card_id: string, board_id: string): Promise<Attachment[]> => {
+    const { data } = await instance.get(`/boards/${board_id}/cards/${card_id}/tasks/${id}/github-attachments`);
+    return data;
+}
+
+export const deleteAttachment = async (id: string, card_id: string, board_id: string, attachment_id: string) => {
+    const { data } = await instance.delete(`/boards/${board_id}/cards/${card_id}/tasks/${id}/github-attachments/${attachment_id}`);
+    return data;
+}
+
+export const attachFromGithub = async (board_id: string, card_id: string, task_id: string, type: string, url: string, title: string) => {
+    const { data } = await instance.post(`/boards/${board_id}/cards/${card_id}/tasks/${task_id}/github-attach`, { type, url, title })
     return data;
 }

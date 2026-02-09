@@ -17,7 +17,8 @@ function TaskItem({ item }: TaskItemProps) {
   useEffect(() => {
     setIsDone(item.status === 'Done');
   }, [item.status])
-
+  
+  console.log("Render Task", item.id);
 
   const handleToggleDone = () => {
     setIsDone(!isDone);

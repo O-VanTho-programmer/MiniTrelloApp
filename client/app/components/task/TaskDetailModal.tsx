@@ -5,11 +5,15 @@ import { Task } from '@/types/Task';
 import { useGetMembers } from '@/hooks/useBoards';
 import { useParams } from 'next/navigation';
 import Avatar from '../ui/Avatar';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import AddMemberModal from './AddMemberModal';
-import { useGetAssignedMemberFromTask } from '@/hooks/useTasks';
+import { useAttachFromGithub, useDeleteAttachment, useGetAssignedMemberFromTask, useGetAttachmentsByTaskId } from '@/hooks/useTasks';
 import ListRepoModal from '../repository/ListRepoModal';
 import { getRepositoryById } from '@/services/githubRepo';
+import { socket } from '@/lib/socket';
+import ListAttachmentsModal from '../repository/ListAttachmentsModal';
+import AttachmentCard from '../repository/AttachmentCard';
+import { Attachment } from '@/types/GithubRepo';
 
 type TaskDetailModalProps = {
     task: Task
@@ -29,17 +33,52 @@ export default function TaskDetailModal({ isOpen, cardName, cardId, task, onDele
 
     const [openMembersinBoard, setOpenMembersinBoard] = useState<boolean>(false);
     const [isOpenRepoModal, setIsOpenRepoModal] = useState<boolean>(false);
+    const [selectedRepo, setSelectedRepo] = useState<any>(null);
+    const [listAttachments, setListAttachments] = useState<any[]>([]);
+    const [selectType, setSelectType] = useState<string>("");
 
     const handleDeleteTask = () => {
+        if (!confirm("Are you sure you want to delete this task?")) {
+            return;
+        }
+
         onDelete(task.id);
         onClose();
     }
 
     const handleSelectRepo = async (repo: any) => {
-        
         const getRepoById = await getRepositoryById(repo.id);
-        
-        console.log(getRepoById);
+        setSelectedRepo(getRepoById);
+        setIsOpenRepoModal(false);
+    }
+
+    const handleOpenListAttachments = async (type: "branches" | "commits" | "issues" | "pulls") => {
+        setListAttachments(selectedRepo[type]);
+        setSelectType(type);
+    }
+
+    const { data: attachments } = useGetAttachmentsByTaskId(task.id, cardId, id as string);
+    const attachFromGithub = useAttachFromGithub();
+    const deleteAttachment = useDeleteAttachment();
+
+    const handleAttachFromGithub = (item: any, type: string) => {
+        attachFromGithub.mutate({
+            board_id: id as string, card_id: cardId, task_id: task.id, payload: {
+                type: type,
+                title: item?.name || item?.title || item?.message,
+                url: item?.url || ""
+            }
+        })
+    }
+
+    const handleDeleteAttachment = (attachment: Attachment) => {
+        deleteAttachment.mutate({
+            id: task.id, board_id: id as string, card_id: cardId, attachment_id: attachment.id
+        }, {
+            onSuccess: () => {
+                alert('Attachment deleted successfully');
+            }
+        })
     }
 
     return (
@@ -49,7 +88,7 @@ export default function TaskDetailModal({ isOpen, cardName, cardId, task, onDele
         >
             <div
                 onClick={(e) => e.stopPropagation()}
-                className="modal-content min-h-[500px] md:min-h-[650px]! relative max-w-3xl! bg-gray-900!">
+                className="modal-content min-h-[500px] max-h-[650px]! overflow-y-scroll relative max-w-3xl! bg-gray-900!">
                 <button
                     onClick={onClose}
                     className="absolute cursor-pointer top-6 right-6 p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-full transition"
@@ -106,6 +145,12 @@ export default function TaskDetailModal({ isOpen, cardName, cardId, task, onDele
                                         className="w-full min-h-[120px] bg-gray-800 border border-gray-700 rounded-lg p-3 text-sm text-gray-200 placeholder-gray-500 transition"
                                     ></textarea>
                                 </div>
+                            </div>
+
+                            <div>
+                                {attachments && attachments.map((attachment, idx) => (
+                                    <AttachmentCard onDelete={() => handleDeleteAttachment(attachment)} key={idx} attachment={attachment} />
+                                ))}
                             </div>
 
                             <div className="flex gap-4">
@@ -168,6 +213,39 @@ export default function TaskDetailModal({ isOpen, cardName, cardId, task, onDele
                                         onClose={() => setIsOpenRepoModal(false)}
                                         onSelectRepo={handleSelectRepo}
                                     />
+                                )}
+                                {selectedRepo && (
+                                    <div className='flex flex-col mt-2 gap-1 relative'>
+                                        {listAttachments.length > 0 && (
+                                            <ListAttachmentsModal
+                                                onSelect={(attachment: any, type: string) => handleAttachFromGithub(attachment, type)}
+                                                type={selectType}
+                                                items={listAttachments}
+                                                isOpen={listAttachments.length > 0}
+                                                onClose={() => setListAttachments([])}
+                                            />
+                                        )}
+                                        <Button
+                                            style='hover:bg-gray-800 text-gray-300 border-2 border-transparent hover:border-gray-400 px-2!'
+                                            onClick={() => handleOpenListAttachments("branches")}
+                                            title='Attach Branch'
+                                        />
+                                        <Button
+                                            style='hover:bg-gray-800 text-gray-300 border-2 border-transparent hover:border-gray-400 px-2!'
+                                            onClick={() => handleOpenListAttachments("commits")}
+                                            title='Attach Commit'
+                                        />
+                                        <Button
+                                            style='hover:bg-gray-800 text-gray-300 border-2 border-transparent hover:border-gray-400 px-2!'
+                                            onClick={() => handleOpenListAttachments("issues")}
+                                            title='Attach Issue'
+                                        />
+                                        <Button
+                                            style='hover:bg-gray-800 text-gray-300 border-2 border-transparent hover:border-gray-400 px-2!'
+                                            onClick={() => handleOpenListAttachments("pulls")}
+                                            title='Attach PR'
+                                        />
+                                    </div>
                                 )}
                             </div>
 

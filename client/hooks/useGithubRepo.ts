@@ -15,3 +15,4 @@ export const useGetRepositories = () => {
         queryFn: () => getAllRepository(),
     })
 }
+

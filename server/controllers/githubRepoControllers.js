@@ -1,3 +1,5 @@
+const { create } = require("../models/Board");
+const GithubAttachment = require("../models/GithubAttachment");
 const getGithubAPI = require("../services/githubAPI");
 
 exports.getRepository = async (req, res) => {
@@ -27,7 +29,8 @@ exports.getRepository = async (req, res) => {
             owner: owner,
             branches: branches.data.map(b => ({
                 name: b.name,
-                lastCommitSha: b.commit.sha
+                lastCommitSha: b.commit.sha,
+                url: `https://github.com/${owner}/${repo}/tree/${b.name}`
             })),
             pulls: pulls.data.map(p => ({
                 title: p.title,
@@ -35,15 +38,16 @@ exports.getRepository = async (req, res) => {
                 url: p.html_url
             })),
             issues: issues.data
-                .filter(i => !i.pull_request)
-                .map(i => ({
-                    title: i.title,
-                    issueNumber: i.number,
-                    url: i.html_url
+                .filter(issue => !issue.pull_request)
+                .map(issue => ({
+                    title: issue.title,
+                    issueNumber: issue.number,
+                    url: issue.html_url
                 })),
-            commits: commits.data.map(c => ({
-                sha: c.sha,
-                message: c.commit.message
+            commits: commits.data.map(commit => ({
+                sha: commit.sha,
+                message: commit.commit.message,
+                url: commit.html_url
             }))
         };
 
@@ -79,3 +83,41 @@ exports.getRepositories = async (req, res) => {
         res.status(500).json({ error: "Failed to fetch repositories" });
     }
 };
+
+exports.attachGithub = async (req, res) => {
+    try {
+        const { type, url, title } = req.body;
+        const { taskId } = req.params
+
+        const newAttachment = await GithubAttachment.create(taskId, title, type, url);
+
+        res.status(201).json(newAttachment);
+    } catch (error) {
+        console.error("Attach Github Error:", error.message);
+        res.status(500).json({ error: "Failed to attach Github" });
+    }
+}
+
+exports.getGithubAttachments = async (req, res) => {
+    try {
+        const { taskId } = req.params;
+        const attachments = await GithubAttachment.getAllByTaskId(taskId);
+
+        res.status(200).json(attachments);
+    } catch (error) {
+        console.error("Get Github Attachments Error:", error.message);
+        res.status(500).json({ error: "Failed to get Github Attachments" });
+    }
+}
+
+exports.deleteGithubAttachment = async (req, res) => {
+    try {
+        const { attachmentId } = req.params;
+        await GithubAttachment.delete(attachmentId);
+
+        res.status(204).json();
+    } catch (error) {
+        console.error("Delete Github Attachment Error:", error.message);
+        res.status(500).json({ error: "Failed to delete Github Attachment" });
+    }
+}

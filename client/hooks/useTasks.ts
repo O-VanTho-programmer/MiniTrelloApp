@@ -1,4 +1,4 @@
-import { assignMemberToTask, createTaskWithInCard, deleteTask, dragAndDropMoveTask, getAssignedMemberFromTask, getTaskById, getTasksByCardId, unassignMemberFromTask, updateTask } from "@/services/task"
+import { assignMemberToTask, attachFromGithub, createTaskWithInCard, deleteAttachment, deleteTask, dragAndDropMoveTask, getAssignedMemberFromTask, getAttachmentsByTaskId, getTaskById, getTasksByCardId, unassignMemberFromTask, updateTask } from "@/services/task"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 export const useGetTasksByCardId = (card_id: string, board_id: string) => {
@@ -39,7 +39,7 @@ export const useUpdateTask = () => {
                 id: string, name: string,
                 description: string, status: string,
                 card_id: string, board_id: string
-            }) => updateTask(id, name, description,status, card_id, board_id),
+            }) => updateTask(id, name, description, status, card_id, board_id),
         onSuccess: (_, { card_id }) => queryClient.invalidateQueries({ queryKey: ["tasks_by_card_id", card_id] })
     })
 }
@@ -81,11 +81,11 @@ export const useGetAssignedMemberFromTask = (id: string, card_id: string, board_
 
 export const useUnassignMemberFromTask = () => {
     const queryClient = useQueryClient();
- 
+
     return useMutation({
         mutationFn: ({ id, card_id, board_id, member_id }: { id: string, card_id: string, board_id: string, member_id: string }) => {
             return unassignMemberFromTask(id, card_id, board_id, member_id)
-        }, onSuccess: (_, {id}) => queryClient.invalidateQueries({
+        }, onSuccess: (_, { id }) => queryClient.invalidateQueries({
             queryKey: ["assigned_member", id]
         })
     })
@@ -98,5 +98,44 @@ export const useDragAndDropMoveTask = () => {
                 id: string, sourceCardId: string,
                 destinationCardId: string, newIndex: number
             }) => dragAndDropMoveTask(id, sourceCardId, destinationCardId, newIndex),
+    })
+}
+
+export const useGetAttachmentsByTaskId = (id: string, card_id: string, board_id: string) => {
+    return useQuery({
+        queryKey: ["attachments", id],
+        queryFn: () => getAttachmentsByTaskId(id, card_id, board_id),
+        enabled: !!id
+    })
+}
+
+export const useDeleteAttachment = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ id, card_id, board_id, attachment_id }
+            : {
+                id: string, card_id: string,
+                board_id: string, attachment_id: string
+            }) => deleteAttachment(id, card_id, board_id, attachment_id),
+        onSuccess: (_, { id }) => queryClient.invalidateQueries({ queryKey: ["attachments", id] })
+    })
+}
+
+export const useAttachFromGithub = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ board_id, card_id, task_id, payload }:
+            {
+                board_id: string, card_id: string,
+                task_id: string,
+                payload: {
+                    type: string,
+                    url: string,
+                    title: string
+                }
+            }) => attachFromGithub(board_id, card_id, task_id, payload.type, payload.url, payload.title),
+            onSuccess: (_, { task_id }) => queryClient.invalidateQueries({ queryKey: ["attachments", task_id] })
     })
 }
