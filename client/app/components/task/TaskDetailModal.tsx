@@ -27,12 +27,6 @@ export default function TaskDetailModal({ isOpen, cardName, cardId, task, onDele
     const { data: membersInBoard, isLoading } = useGetMembers(id as string);
     const { data: membersWithTaskId } = useGetAssignedMemberFromTask(task.id, cardId, id as string);
 
-    const members = useMemo(() => {
-        if (!membersWithTaskId) return [];
-
-        return membersWithTaskId.members;
-    }, [membersWithTaskId])
-
     const [openMembersinBoard, setOpenMembersinBoard] = useState<boolean>(false);
     const [isOpenRepoModal, setIsOpenRepoModal] = useState<boolean>(false);
 
@@ -85,7 +79,7 @@ export default function TaskDetailModal({ isOpen, cardName, cardId, task, onDele
                                 <div className="space-y-1.5">
                                     <h4 className="text-xs font-semibold text-gray-400 uppercase">Members</h4>
                                     <div className="flex items-center gap-2">
-                                        {members?.map((mem, idx) => (
+                                        {membersWithTaskId?.members?.map((mem, idx) => (
                                             <Avatar key={idx} user={mem} />
                                         ))}
                                         <button className="w-8 h-8 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-300 transition cursor-pointer">
@@ -152,7 +146,7 @@ export default function TaskDetailModal({ isOpen, cardName, cardId, task, onDele
                                             taskId={task.id}
                                             cardId={cardId}
                                             members={membersInBoard || []}
-                                            membersInTask={members || []}
+                                            membersInTask={membersWithTaskId?.members || []}
                                             onClose={() => setOpenMembersinBoard(false)}
                                         />
                                     </div>
