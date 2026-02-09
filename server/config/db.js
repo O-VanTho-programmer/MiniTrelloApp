@@ -4,5 +4,6 @@ const { getFirestore } = require('firebase-admin/firestore');
 const serviceAccount = require('../serviceAccountKey.json');
 initializeApp({ credential: cert(serviceAccount) });
 const db = getFirestore();
+db.settings({ ignoreUndefinedProperties: true });
 
 module.exports = { db };
