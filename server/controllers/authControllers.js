@@ -30,6 +30,8 @@ exports.githubLogin = async (req, res) => {
         
         const access_token = respone.data.access_token;
 
+        console.log(access_token)
+
         if (!access_token) {
             return res.status(400).json({ error: "Error with getting access token from GitHub" });
         }

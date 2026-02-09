@@ -2,7 +2,7 @@ import { FaPlus, FaTimes } from 'react-icons/fa'
 import { useEffect, useRef, useState } from 'react'
 import FormNewList from './FormNewCard'
 import { BiMenu } from 'react-icons/bi'
-import { useDeleteCard } from '@/hooks/useCards'
+import { useDeleteCard, useEditCard } from '@/hooks/useCards'
 import { useParams } from 'next/navigation'
 import { useCreateTaskWithInCard, useDeleteTask, useGetTasksByCardId } from '@/hooks/useTasks'
 import TaskItem from '../task/TaskItem'
@@ -21,6 +21,7 @@ function CardContainer({ name, card_id }: CardContainerProps) {
     const { data: tasks } = useGetTasksByCardId(card_id, id as string);
 
     const [isCreatingTask, setIsCreatingTask] = useState(false);
+    const [isEditingCard, setIsEditingCard] = useState(false);
     const [openSetting, setOpenSetting] = useState(false);
     const [selectedTask, setSelectedTask] = useState<TaskWithAssignedMember | null>(null);
 
@@ -34,6 +35,7 @@ function CardContainer({ name, card_id }: CardContainerProps) {
         const handleOutsideClick = (event: MouseEvent) => {
             if (listActionRef.current && !listActionRef.current.contains(event.target as Node)) {
                 setOpenSetting(false);
+                setIsEditingCard(false);
             }
         };
 
@@ -67,6 +69,20 @@ function CardContainer({ name, card_id }: CardContainerProps) {
         })
     }
 
+    const editCard = useEditCard();
+
+    const handleEditCard = (name: string, description: string) => {
+        editCard.mutate({ id: card_id, board_id: id as string, name, description }, {
+            onSuccess: () => {
+                setIsEditingCard(false);
+            },
+            onError: () => {
+                alert('Failed to edit card');
+            },
+        })
+
+    }
+
     return (
         <div className="min-w-[250px] max-w-72 flex-1 shrink-0">
             <div className="bg-gray-800 rounded-xl p-3 shadow-sm">
@@ -88,6 +104,20 @@ function CardContainer({ name, card_id }: CardContainerProps) {
                                     <li
                                         onClick={() => setIsCreatingTask(true)}
                                         className='py-2 px-2 hover:bg-gray-400 cursor-pointer'>Add Task</li>
+                                    <li>
+                                        {isEditingCard ? (
+                                            <div className='p-2'>
+                                                <FormNewList isOpen={isEditingCard}
+                                                    onClose={() => setIsEditingCard(false)}
+                                                    onSubmit={handleEditCard}
+                                                    title='Edit Card' />
+                                            </div>
+                                        ) : (
+                                            <button className='w-full text-start py-2 px-2 hover:bg-gray-400 cursor-pointer' onClick={() => setIsEditingCard(true)}>
+                                                Edit Card
+                                            </button>
+                                        )}
+                                    </li>
                                     <li onClick={handleDeleteCard} className='py-2 px-2 hover:bg-gray-400 cursor-pointer'>Delete</li>
                                 </ul>
                             </div>

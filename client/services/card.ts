@@ -20,3 +20,8 @@ export const deleteCard = async (id: string, board_id: string) => {
     const { data } = await instance.delete(`/boards/${board_id}/cards/${id}`)
     return data;
 }
+
+export const updateCard = async (id: string, board_id: string, name: string, description: string) => {
+    const { data } = await instance.put(`/boards/${board_id}/cards/${id}`, { name, description })
+    return data;
+}

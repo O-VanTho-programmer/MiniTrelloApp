@@ -42,7 +42,11 @@ exports.getCardsByUser = async (req, res) => {
 }
 
 exports.updateCard = async (req, res) => {
+    const cardId = req.params.id;
+    const { name, description } = req.body;
 
+    const card = await Card.update(cardId, { name, description });
+    res.status(200).json(card);
 }
 
 exports.deleteCard = async (req, res) => {

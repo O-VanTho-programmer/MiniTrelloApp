@@ -6,7 +6,8 @@ type Props = {
     isOpen: boolean
     onSubmit: (name: string, description: string) => void
     onClose: () => void
-    title: string
+    title: string,
+    isLoading?: boolean
 }
 
 function FormNewCard({
@@ -14,6 +15,7 @@ function FormNewCard({
     onSubmit,
     onClose,
     title,
+    isLoading = false
 }: Props) {
 
     const [name, setName] = useState<string>('');
@@ -38,6 +40,7 @@ function FormNewCard({
     return (
         <div className="bg-gray-700 rounded-xl p-3 shadow-xl">
             <input
+                disabled={isLoading}
                 autoFocus
                 type="text"
                 placeholder="Enter name"
@@ -47,6 +50,7 @@ function FormNewCard({
             />
 
             <textarea
+                disabled={isLoading}
                 placeholder="Enter description (optional)"
                 className="w-full px-3 py-2 rounded-lg bg-gray-800 border-2 border-gray-500 text-white text-sm focus:outline-none mb-3 placeholder-gray-500"
                 value={description}
@@ -55,13 +59,15 @@ function FormNewCard({
 
             <div className="flex items-center gap-2">
                 <Button
-                    disabled={name.trim().length === 0}
+                    disabled={name.trim().length === 0 || isLoading}
+                    isSaving={isLoading}
                     onClick={handleAddList}
                     title={title}
                     style="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded text-sm"
                 />
                 <button
                     onClick={onClose}
+                    disabled={isLoading}
                     className="text-gray-400 hover:text-gray-100 p-2 rounded hover:bg-gray-700 cursor-pointer"
                 >
                     <FaTimes size={16} />

@@ -1,4 +1,4 @@
-import { createCard, deleteCard, getCardsByBoardId } from "@/services/card"
+import { createCard, deleteCard, getCardsByBoardId, updateCard } from "@/services/card"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 export const useGetCardsByBoardId = (board_id: string) => {
@@ -31,4 +31,17 @@ export const useDeleteCard = () => {
         }
     })
 
+}
+
+export const useEditCard = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ id, board_id, name, description }: { id: string, board_id: string, name: string, description: string }) => {
+            return await updateCard(id, board_id, name, description)
+        },
+        onSuccess: (_, { board_id }) => {
+            queryClient.invalidateQueries({ queryKey: ["cards_by_board_id", board_id] })
+        }
+    })
 }
