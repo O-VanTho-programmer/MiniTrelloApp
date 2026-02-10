@@ -8,7 +8,7 @@ export default function BoardLayout({
 }>) {
     return (
         <UserProvider>
-            <div className={``}>
+            <div className={`h-screen`}>
                 <HeaderBar />
                 {children}
             </div>

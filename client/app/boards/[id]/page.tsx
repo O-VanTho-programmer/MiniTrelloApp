@@ -189,10 +189,11 @@ function BoardPage() {
     }
 
     return (
-        <div className='flex'>
+        <div className='flex h-screen md:h-[calc(100vh-50px)]'>
             <SideBoard
                 onCloseBoard={handleCloseBoard}
                 members={membersInBoard} />
+
             <section className='flex-1 overflow-scroll'>
                 <header className='flex justify-between items-center px-4 py-2 bg-pink-600 text-white'>
                     <h3 className=''>My Trello board</h3>

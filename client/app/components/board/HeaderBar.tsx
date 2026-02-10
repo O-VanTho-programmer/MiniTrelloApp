@@ -23,11 +23,16 @@ function HeaderBar() {
 
     const [isNotifMenuOpen, setIsNotifMenuOpen] = useState(false);
     const notifRef = useRef<HTMLDivElement>(null);
+    const [isOpenMenu, setIsOpenMenu] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
                 setIsNotifMenuOpen(false);
+            }
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setIsOpenMenu(false);
             }
         };
 
@@ -73,7 +78,7 @@ function HeaderBar() {
     }
 
     return (
-        <div className="min-h-[50px] text-white flex items-center justify-between px-4 py-2 bg-gray-700">
+        <div className="h-[50px] text-white flex items-center justify-between px-4 py-2 bg-gray-700">
             <span>
                 Logo
             </span>
@@ -121,7 +126,7 @@ function HeaderBar() {
                                                     <p className="text-gray-500">{inv.status === 'accepted' ? 'Accepted' : 'Declined'}</p>
                                                     <button
                                                         onClick={() => handleDeleteInvitation(inv)}
-                                                    className="absolute right-3 top-3 p-1 cursor-pointer text-gray-500 border rounded-full hover:text-red-500">
+                                                        className="absolute right-3 top-3 p-1 cursor-pointer text-gray-500 border rounded-full hover:text-red-500">
                                                         <BiTrash size={16} />
                                                     </button>
                                                 </>
@@ -134,12 +139,17 @@ function HeaderBar() {
                     )}
                 </div>
                 <div className="relative">
-                    <div className="peer cursor-pointer">
+                    <div onClick={() => setIsOpenMenu(!isOpenMenu)} className="peer cursor-pointer">
                         <Avatar user={user} />
                     </div>
-                    <ul className="z-50 absolute right-0 bg-gray-700 hidden peer-hover:block hover:block hover:bg-gray-600 rounded-sm p-1 min-w-[100px]">
-                        <li onClick={handleLogout} className="cursor-pointer py-1 px-3 text-center">Logout</li>
-                    </ul>
+                    {isOpenMenu && (
+                        <div ref={menuRef} className="min-w-[100px] z-50 absolute right-0 bg-gray-700 rounded-sm">
+                            <ul className="">
+                                <li onClick={handleLogout} className="hover:bg-gray-600 cursor-pointer py-2 px-3 text-center">Logout</li>
+                            </ul>
+
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
