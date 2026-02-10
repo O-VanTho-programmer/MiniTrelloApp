@@ -15,7 +15,7 @@ import { getUserByEmailSearch } from '@/services/auth';
 import { DragDropContext } from '@hello-pangea/dnd';
 import { useQueryClient } from '@tanstack/react-query';
 import { Task } from '@/types/Task';
-import { useDragAndDropMoveTask } from '@/hooks/useTasks';
+import { useDragAndDropMoveTask, useUpdateTask } from '@/hooks/useTasks';
 import { socket } from '@/lib/socket';
 
 function BoardPage() {
@@ -66,10 +66,15 @@ function BoardPage() {
             });
         });
 
+        socket.on("update_task_2", ({ cardId }) => {
+            queryClient.invalidateQueries({ queryKey: ['tasks_by_card_id', cardId] });
+        })
+
         return () => {
             socket.emit('leave_board', id as string);
             socket.off('task_move');
             socket.off('update_task');
+            socket.off('update_task_2');
             socket.disconnect();
         };
     }, [id])

@@ -7,7 +7,7 @@ import { useParams } from 'next/navigation';
 import Avatar from '../ui/Avatar';
 import { useState } from 'react';
 import AddMemberModal from './AddMemberModal';
-import { useAttachFromGithub, useDeleteAttachment, useGetAssignedMemberFromTask, useGetAttachmentsByTaskId } from '@/hooks/useTasks';
+import { useAttachFromGithub, useDeleteAttachment, useDeleteTask, useGetAssignedMemberFromTask, useGetAttachmentsByTaskId, useUpdateTask } from '@/hooks/useTasks';
 import ListRepoModal from '../repository/ListRepoModal';
 import { getRepositoryById } from '@/services/githubRepo';
 import { socket } from '@/lib/socket';
@@ -20,11 +20,10 @@ type TaskDetailModalProps = {
     cardName: string
     cardId: string
     isOpen: boolean;
-    onDelete: (taskId: string) => void;
     onClose: () => void;
 };
 
-export default function TaskDetailModal({ isOpen, cardName, cardId, task, onDelete, onClose }: TaskDetailModalProps) {
+export default function TaskDetailModal({ isOpen, cardName, cardId, task, onClose }: TaskDetailModalProps) {
     if (!isOpen) return null;
 
     const { id } = useParams(); //boardid
@@ -37,15 +36,6 @@ export default function TaskDetailModal({ isOpen, cardName, cardId, task, onDele
     const [listAttachments, setListAttachments] = useState<any[]>([]);
     const [selectType, setSelectType] = useState<string>("");
 
-    const handleDeleteTask = () => {
-        if (!confirm("Are you sure you want to delete this task?")) {
-            return;
-        }
-
-        onDelete(task.id);
-        onClose();
-    }
-
     const handleSelectRepo = async (repo: any) => {
         const getRepoById = await getRepositoryById(repo.id);
         setSelectedRepo(getRepoById);
@@ -57,7 +47,27 @@ export default function TaskDetailModal({ isOpen, cardName, cardId, task, onDele
         setSelectType(type);
     }
 
+    const deleteTask = useDeleteTask();
+
+    const handleDeleteTask = () => {
+        if (!confirm("Are you sure you want to delete this task?")) {
+            return;
+        }
+
+        deleteTask.mutate({ id: task.id, board_id: id as string, card_id: cardId }, {
+            onSuccess: () => {
+                socket.emit("update_task", { boardId: id as string, cardId: cardId })
+                alert('Task deleted successfully');
+                onClose();
+            },
+            onError: () => {
+                alert('Failed to delete task');
+            }
+        })
+    }
+
     const { data: attachments } = useGetAttachmentsByTaskId(task.id, cardId, id as string);
+
     const attachFromGithub = useAttachFromGithub();
     const deleteAttachment = useDeleteAttachment();
 
@@ -77,6 +87,24 @@ export default function TaskDetailModal({ isOpen, cardName, cardId, task, onDele
         }, {
             onSuccess: () => {
                 alert('Attachment deleted successfully');
+            }
+        })
+    }
+
+    const [nameTask, setNameTask] = useState<string>(task.name);
+    const [descriptionTask, setDescriptionTask] = useState<string>(task.description || "");
+
+    const updateTask = useUpdateTask();
+
+    const handleEditTask = (name: string, description: string) => {
+        updateTask.mutate({
+            id: task.id, name: name,
+            description: description || "", status: task.status,
+            card_id: task.card_id, board_id: id as string
+        }, {
+            onSuccess: () => {
+                alert("Task updated successfully");
+                socket.emit("update_task", { boardId: id as string, cardId: cardId })
             }
         })
     }
@@ -101,7 +129,7 @@ export default function TaskDetailModal({ isOpen, cardName, cardId, task, onDele
                     <div className="flex gap-4">
                         <div className="pt-1 text-gray-400"><FaRegCreditCard size={20} /></div>
                         <div className="w-full">
-                            <h2 className="text-xl font-semibold text-gray-100 mb-1">{task.name}</h2>
+                            <input className='text-xl font-semibold text-gray-100 mb-1 placeholder-white' placeholder={nameTask} onChange={(e) => setNameTask(e.target.value)} />
                             <p className="text-sm text-gray-400">
                                 in list {cardName}
                             </p>
@@ -111,8 +139,7 @@ export default function TaskDetailModal({ isOpen, cardName, cardId, task, onDele
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
 
                         {/* Left Col */}
-                        <div className="md:col-span-3 space-y-8">
-
+                        <div className="md:col-span-3 space-y-8 flex flex-col">
                             <div className="flex flex-wrap gap-6">
                                 {/*Members List */}
                                 <div className="space-y-1.5">
@@ -142,15 +169,30 @@ export default function TaskDetailModal({ isOpen, cardName, cardId, task, onDele
                                     <h3 className="text-lg font-semibold text-gray-200">Description</h3>
                                     <textarea
                                         placeholder="Add a more detailed description..."
+                                        value={descriptionTask || ""}
+                                        onChange={(e) => setDescriptionTask(e.target.value)}
                                         className="w-full min-h-[120px] bg-gray-800 border border-gray-700 rounded-lg p-3 text-sm text-gray-200 placeholder-gray-500 transition"
                                     ></textarea>
                                 </div>
                             </div>
 
+                            <Button
+                                title='Save'
+                                onClick={() => handleEditTask(nameTask, descriptionTask)}
+                                style='bg-gray-800 hover:bg-gray-700 text-gray-300 border-2 border-gray-400 self-end! w-fit'
+                                isSaving={updateTask.isPending}
+                                disabled={updateTask.isPending || (!nameTask || nameTask === task.name) && descriptionTask === task.description}
+                            />
+
                             <div>
-                                {attachments && attachments.map((attachment, idx) => (
-                                    <AttachmentCard onDelete={() => handleDeleteAttachment(attachment)} key={idx} attachment={attachment} />
-                                ))}
+                                {attachments && (
+                                    <>
+                                        <h3 className="text-lg font-semibold text-gray-200 mb-2">Attachments</h3>
+                                        {attachments.map((attachment, idx) => (
+                                            <AttachmentCard onDelete={() => handleDeleteAttachment(attachment)} key={idx} attachment={attachment} />
+                                        ))}
+                                    </>
+                                )}
                             </div>
 
                             <div className="flex gap-4">

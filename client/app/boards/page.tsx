@@ -1,7 +1,7 @@
 'use client';
 
 import NavSideWorkPlace from "../components/board/NavSideWorkPlace";
-import { useCreateBoard, useGetBoardsByUser } from "@/hooks/useBoards";
+import { useCreateBoard, useGetBoardsByUser, useUpdateBoard } from "@/hooks/useBoards";
 import { useState } from "react";
 import Link from "next/link";
 import { BsPlus } from "react-icons/bs";

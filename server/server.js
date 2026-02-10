@@ -43,6 +43,10 @@ io.on('connection', (socket) => {
         socket.to(boardId).emit("update_task", { cardId, taskId, status });
         console.log(`User ${socket.id} update task in board ${boardId}`);
     })
+
+    socket.on('update_task_2', ({boardId, cardId}) => {
+        socket.to(boardId).emit("update_task_2", {cardId});
+    })
 });
 
 // API Routes

@@ -27,7 +27,6 @@ function CardContainer({ name, card_id }: CardContainerProps) {
 
     const deleteCardById = useDeleteCard();
     const createTask = useCreateTaskWithInCard();
-    const deleteTask = useDeleteTask();
 
     const listActionRef = useRef<HTMLDivElement>(null);
 
@@ -49,14 +48,6 @@ function CardContainer({ name, card_id }: CardContainerProps) {
             onSuccess: () => {
                 alert('Task created successfully');
                 setIsCreatingTask(false);
-            }
-        })
-    }
-
-    const handleDeleteTask = (id: string) => {
-        deleteTask.mutate({ id, board_id: id as string, card_id }, {
-            onSuccess: () => {
-                alert('Task deleted successfully');
             }
         })
     }
@@ -181,7 +172,6 @@ function CardContainer({ name, card_id }: CardContainerProps) {
                         cardId={card_id}
                         task={selectedTask}
                         isOpen={selectedTask !== null}
-                        onDelete={() => handleDeleteTask(selectedTask.id)}
                         onClose={() => setSelectedTask(null)}
                     />
                 )
