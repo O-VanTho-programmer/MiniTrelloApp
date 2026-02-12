@@ -18,7 +18,7 @@ function ListRepoModal({ isOpen, onClose, onSelectRepo, }: ListRepoModalProps) {
     }
 
     return (
-        <div className="modal">
+        <div className="modal absolute!">
             <div className="modal-content max-h-[500px] ">
 
                 <div className="flex items-center justify-between px-3 py-4">

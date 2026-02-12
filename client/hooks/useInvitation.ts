@@ -14,10 +14,8 @@ export const useAcceptInvitation = (userId: string) => {
     return useMutation({
         mutationFn: ({ inviteId }: { inviteId: string }) => acceptInvitation(inviteId),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["invitations", userId] });
-            queryClient.invalidateQueries({
-                queryKey: ["boards", userId]
-            })
+            queryClient.invalidateQueries({ queryKey: ["invitations", userId] })
+            queryClient.invalidateQueries({ queryKey: ["boardsByUser"] })
         }
     })
 }
@@ -27,7 +25,10 @@ export const useDeclineInvitation = (userId: string) => {
 
     return useMutation({
         mutationFn: ({ inviteId }: { inviteId: string }) => declineInvitation(inviteId),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["invitations", userId] })
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["invitations", userId] })
+            queryClient.invalidateQueries({ queryKey: ["boardsByUser"] })
+        }
     })
 }
 

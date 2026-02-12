@@ -71,7 +71,7 @@ export default function SideBoard({ members = [], onCloseBoard }: SideBoardProps
                     <p className="mb-3 text-xs text-gray-500 leading-relaxed">
                         You can't find and reopen closed boards if close the board.
                     </p>
-                    <button onClick={onCloseBoard} className="w-full bg-red-500/10 hover:bg-red-500 hover:text-white text-red-500 border border-red-500/50 py-2 px-4 rounded font-medium text-sm transition-all shadow-sm">
+                    <button onClick={onCloseBoard} className="w-full cursor-pointer bg-gray-800 hover:bg-red-500 hover:text-white text-red-500 border border-red-500/50 py-2 px-4 rounded font-medium text-sm transition-all shadow-sm">
                         Close Board
                     </button>
                 </div>

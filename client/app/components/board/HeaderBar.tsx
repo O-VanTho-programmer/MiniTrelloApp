@@ -68,11 +68,11 @@ function HeaderBar() {
             }
         })
     }
+    const queryClient = useQueryClient();
 
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        const queryClient = useQueryClient();
         queryClient.setQueryData(["user"], null);
         router.push('/auth');
     }

@@ -46,17 +46,20 @@ function CardContainer({ name, card_id }: CardContainerProps) {
     const handleCreateTask = (name: string, description: string) => {
         createTask.mutate({ name: name, description: description, card_id, board_id: id as string }, {
             onSuccess: () => {
-                alert('Task created successfully');
                 setIsCreatingTask(false);
-            }
+            }, onError() {
+                alert('Failed to create task');
+            },
         })
     }
 
     const handleDeleteCard = () => {
         deleteCardById.mutate({ id: card_id, board_id: id as string }, {
             onSuccess: () => {
-                alert('Card deleted successfully');
-            }
+                // alert('Card deleted successfully');
+            }, onError() {
+                alert('Failed to delete card');
+            },
         })
     }
 
@@ -101,6 +104,7 @@ function CardContainer({ name, card_id }: CardContainerProps) {
                                                 <FormNewList isOpen={isEditingCard}
                                                     onClose={() => setIsEditingCard(false)}
                                                     onSubmit={handleEditCard}
+                                                    isLoading={editCard.isPending}
                                                     title='Edit Card' />
                                             </div>
                                         ) : (
@@ -151,6 +155,7 @@ function CardContainer({ name, card_id }: CardContainerProps) {
                 <div className='w-full'>
                     {isCreatingTask ? (
                         <FormNewList isOpen={isCreatingTask}
+                            isLoading={createTask.isPending}
                             onClose={() => setIsCreatingTask(false)}
                             onSubmit={handleCreateTask}
                             title='Add Task' />

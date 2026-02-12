@@ -142,7 +142,7 @@ export default function TaskDetailModal({ isOpen, cardName, cardId, task, onClos
                         <div className="md:col-span-3 space-y-8 flex flex-col">
                             <div className="flex flex-wrap gap-6">
                                 {/*Members List */}
-                                <div className="space-y-1.5">
+                                <div className="space-y-1.5 relative">
                                     <h4 className="text-xs font-semibold text-gray-400 uppercase">Members</h4>
                                     <div className="flex items-center gap-2">
                                         {membersWithTaskId?.members?.map((mem, idx) => (
@@ -219,7 +219,7 @@ export default function TaskDetailModal({ isOpen, cardName, cardId, task, onClos
                         {/* Right Col */}
 
                         <div className="md:col-span-1 space-y-6">
-                            <div className="space-y-2">
+                            <div className="space-y-2 relative">
                                 <span className="text-sm font-semibold text-gray-500">Add to card</span>
                                 <Button
                                     onClick={() => setOpenMembersinBoard(true)}
@@ -228,7 +228,7 @@ export default function TaskDetailModal({ isOpen, cardName, cardId, task, onClos
                                     title="Members"
                                 />
                                 {openMembersinBoard && (
-                                    <div className='absolute'>
+                                    <div className='absolute right-0'>
                                         <AddMemberModal
                                             taskId={task.id}
                                             cardId={cardId}
@@ -249,13 +249,7 @@ export default function TaskDetailModal({ isOpen, cardName, cardId, task, onClos
                                     title="GitHub"
                                 />
 
-                                {isOpenRepoModal && (
-                                    <ListRepoModal
-                                        isOpen={isOpenRepoModal}
-                                        onClose={() => setIsOpenRepoModal(false)}
-                                        onSelectRepo={handleSelectRepo}
-                                    />
-                                )}
+
                                 {selectedRepo && (
                                     <div className='flex flex-col mt-2 gap-1 relative'>
                                         {listAttachments.length > 0 && (
@@ -299,6 +293,13 @@ export default function TaskDetailModal({ isOpen, cardName, cardId, task, onClos
                         </div>
                     </div>
                 </div>
+                {isOpenRepoModal && (
+                    <ListRepoModal
+                        isOpen={isOpenRepoModal}
+                        onClose={() => setIsOpenRepoModal(false)}
+                        onSelectRepo={handleSelectRepo}
+                    />
+                )}
             </div>
         </div>
     );

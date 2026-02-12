@@ -80,16 +80,19 @@ function BoardPage() {
     }, [id])
 
     const handleCreateCard = (name: string) => {
-        if (!confirm("Are you sure you want to close this board?")) return;
-
         createCard.mutate({ name, board_id: id as string }, {
             onSuccess: () => {
-                alert('Card created successfully');
+                setIsCreatingList(false);
+            },
+            onError: () => {
+                alert('Failed to create card');
             }
         })
     }
 
     const handleCloseBoard = () => {
+        if (!confirm("Are you sure you want to close this board?")) return;
+
         updateStatusBoard.mutate({ id: id as string, isActive: false }, {
             onSuccess: () => {
                 alert('Board closed successfully');
@@ -187,7 +190,9 @@ function BoardPage() {
 
         socket.emit("task_move", { boardId: id as string, taskId, sourceCardId, destCardId: destinationCardId, prevIndex: prevIndexOfTask, newIndex: newIndexOfTask });
     }
-
+    if(isLoadingCards){
+        return;
+    }
     return (
         <div className='flex h-screen md:h-[calc(100vh-50px)]'>
             <SideBoard
@@ -216,6 +221,7 @@ function BoardPage() {
                             <div className="min-w-[200px] max-w-72 transition-all duration-200">
                                 {isCreatingList ? (
                                     <FormNewList isOpen={isCreatingList}
+                                        isLoading={createCard.isPending}
                                         onClose={() => setIsCreatingList(false)}
                                         onSubmit={handleCreateCard}
                                         title='Add Card' />
