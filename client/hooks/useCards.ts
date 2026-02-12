@@ -17,7 +17,7 @@ export const useCreateCard = () => {
         onSuccess: async (_, { board_id }) => await queryClient.invalidateQueries({
             queryKey: ["cards_by_board_id", board_id]
         }),
-        onError: (err) => console.log(err)
+        onError: () => alert("Something went wrong")
     })
 }
 
@@ -40,8 +40,9 @@ export const useEditCard = () => {
         mutationFn: async ({ id, board_id, name, description }: { id: string, board_id: string, name: string, description: string }) => {
             return await updateCard(id, board_id, name, description)
         },
-        onSuccess: (_, { board_id }) => {
+        onError: (_, { board_id }) => {
+            alert("Something went wrong")
             queryClient.invalidateQueries({ queryKey: ["cards_by_board_id", board_id] })
-        }
+        },
     })
 }

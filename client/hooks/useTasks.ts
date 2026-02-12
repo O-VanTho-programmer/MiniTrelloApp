@@ -40,7 +40,10 @@ export const useUpdateTask = () => {
                 description: string, status: string,
                 card_id: string, board_id: string
             }) => updateTask(id, name, description, status, card_id, board_id),
-        onSuccess: (_, { card_id }) => queryClient.invalidateQueries({ queryKey: ["tasks_by_card_id", card_id] })
+        onError: (_, { card_id }) => {
+            alert("Something went wrong")
+            queryClient.invalidateQueries({ queryKey: ["tasks_by_card_id", card_id] })
+        }
     })
 }
 
@@ -52,7 +55,7 @@ export const useDeleteTask = () => {
                 id: string, card_id: string,
                 board_id: string
             }) => deleteTask(id, card_id, board_id),
-        onSuccess: (_, { card_id }) => queryClient.invalidateQueries({ queryKey: ["tasks_by_card_id", card_id] })
+        onSuccess: (_, { card_id }) => queryClient.invalidateQueries({ queryKey: ["tasks_by_card_id", card_id] }),
     })
 }
 
@@ -83,21 +86,33 @@ export const useUnassignMemberFromTask = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ id, card_id, board_id, member_id }: { id: string, card_id: string, board_id: string, member_id: string }) => {
-            return unassignMemberFromTask(id, card_id, board_id, member_id)
-        }, onSuccess: (_, { id }) => queryClient.invalidateQueries({
+        mutationFn: ({ id, card_id, board_id, member_id }:
+            { id: string, card_id: string, board_id: string, member_id: string }) => unassignMemberFromTask(id, card_id, board_id, member_id),
+        onSuccess: (_, { id }) => queryClient.invalidateQueries({
             queryKey: ["assigned_member", id]
         })
     })
 }
 
 export const useDragAndDropMoveTask = () => {
+    const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn: ({ id, sourceCardId, destinationCardId, newIndex }:
             {
                 id: string, sourceCardId: string,
                 destinationCardId: string, newIndex: number
             }) => dragAndDropMoveTask(id, sourceCardId, destinationCardId, newIndex),
+
+        onSuccess: () => {
+            console.log('Task moved successfully');
+        },
+        onError: (error, { sourceCardId, destinationCardId }) => {
+            console.error('Error moving task:', error);
+            alert("Something went wrong");
+            queryClient.invalidateQueries({ queryKey: ["tasks_by_card_id", sourceCardId] })
+            queryClient.invalidateQueries({ queryKey: ["tasks_by_card_id", destinationCardId] })
+        }
     })
 }
 
@@ -136,6 +151,6 @@ export const useAttachFromGithub = () => {
                     title: string
                 }
             }) => attachFromGithub(board_id, card_id, task_id, payload.type, payload.url, payload.title),
-            onSuccess: (_, { task_id }) => queryClient.invalidateQueries({ queryKey: ["attachments", task_id] })
+        onSuccess: (_, { task_id }) => queryClient.invalidateQueries({ queryKey: ["attachments", task_id] })
     })
 }

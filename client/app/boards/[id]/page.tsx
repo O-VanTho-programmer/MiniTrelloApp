@@ -200,14 +200,7 @@ function BoardPage() {
             queryClient.setQueryData(['tasks_by_card_id', destinationCardId], newTasksInDesCard);
         }
 
-        moveTask.mutate({ id: taskId, sourceCardId, destinationCardId, newIndex: newIndexOfTask }, {
-            onSuccess: () => {
-                console.log('Task moved successfully');
-            },
-            onError: (error) => {
-                console.error('Error moving task:', error);
-            }
-        });
+        moveTask.mutate({ id: taskId, sourceCardId, destinationCardId, newIndex: newIndexOfTask });
 
         socket.emit("task_move", { boardId: id as string, taskId, sourceCardId, destCardId: destinationCardId, prevIndex: prevIndexOfTask, newIndex: newIndexOfTask });
     }
