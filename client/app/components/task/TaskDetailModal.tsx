@@ -104,7 +104,7 @@ export default function TaskDetailModal({ isOpen, cardName, cardId, task, onClos
         }, {
             onSuccess: () => {
                 alert("Task updated successfully");
-                socket.emit("update_task", { boardId: id as string, cardId: cardId })
+                socket.emit("update_task_name_desc", { boardId: id as string, cardId: cardId, taskId: task.id, name, description})
             }
         })
     }

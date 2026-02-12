@@ -60,21 +60,42 @@ function BoardPage() {
 
             queryClient.setQueryData(['tasks_by_card_id', cardId], (oldTasks: Task[]) => {
                 if (!oldTasks) return oldTasks;
+                
                 return oldTasks.map(task =>
                     task.id === taskId ? { ...task, status: status } : task
                 );
             });
         });
 
-        socket.on("update_task_2", ({ cardId }) => {
-            queryClient.invalidateQueries({ queryKey: ['tasks_by_card_id', cardId] });
+        socket.on("update_task_name_desc", ({ cardId, taskId, name, description }) => {
+            
+            console.log(name, description)
+            queryClient.setQueryData(['tasks_by_card_id', cardId], (oldTasks: Task[]) => {
+                if (!oldTasks) return oldTasks;
+
+                return oldTasks.map(task =>
+                    task.id === taskId ? { ...task, name, description } : task
+                )
+            })
         })
+
+        socket.on("update_card_name_desc", ({ cardId, name, description }) => {
+            queryClient.setQueryData(['cards_by_board_id', id as string], (oldCards: any[]) => {
+                if (!oldCards) return oldCards; 
+
+                return oldCards.map(card =>
+                    card.id === cardId ? { ...card, name, description } : card
+                )
+            })
+        })
+
 
         return () => {
             socket.emit('leave_board', id as string);
             socket.off('task_move');
             socket.off('update_task');
-            socket.off('update_task_2');
+            socket.off('update_task_name_desc');
+            socket.off('update_card_name_desc');
             socket.disconnect();
         };
     }, [id])
@@ -190,7 +211,7 @@ function BoardPage() {
 
         socket.emit("task_move", { boardId: id as string, taskId, sourceCardId, destCardId: destinationCardId, prevIndex: prevIndexOfTask, newIndex: newIndexOfTask });
     }
-    if(isLoadingCards){
+    if (isLoadingCards) {
         return;
     }
     return (

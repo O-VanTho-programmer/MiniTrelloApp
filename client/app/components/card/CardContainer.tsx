@@ -9,6 +9,7 @@ import TaskItem from '../task/TaskItem'
 import { TaskWithAssignedMember } from '@/types/Task'
 import TaskDetailModal from '../task/TaskDetailModal'
 import { Draggable, Droppable } from '@hello-pangea/dnd'
+import { socket } from '@/lib/socket'
 
 type CardContainerProps = {
     name: string
@@ -69,6 +70,7 @@ function CardContainer({ name, card_id }: CardContainerProps) {
         editCard.mutate({ id: card_id, board_id: id as string, name, description }, {
             onSuccess: () => {
                 setIsEditingCard(false);
+                socket.emit("update_card_name_desc", { boardId: id as string, cardId: card_id, name, description })
             },
             onError: () => {
                 alert('Failed to edit card');

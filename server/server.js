@@ -44,8 +44,12 @@ io.on('connection', (socket) => {
         console.log(`User ${socket.id} update task in board ${boardId}`);
     })
 
-    socket.on('update_task_2', ({boardId, cardId}) => {
-        socket.to(boardId).emit("update_task_2", {cardId});
+    socket.on('update_task_name_desc', ({boardId, cardId, taskId, name, description}) => {
+        socket.to(boardId).emit("update_task_name_desc", {cardId, taskId, name, description});
+    })
+
+    socket.on('update_card_name_desc', ({boardId, cardId, name, description}) => {
+        socket.to(boardId).emit("update_card_name_desc", {cardId, name, description});
     })
 });
 
