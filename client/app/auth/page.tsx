@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useSendCodeSignin, useSignIn } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 export default function AuthPage() {
     const router = useRouter();
@@ -35,7 +36,7 @@ export default function AuthPage() {
 
         sendCode.mutate({ email }, {
             onSuccess: () => {
-                alert("Code sent successfully");
+                toast.success("Code sent successfully");
                 setOpenVerifyCode(true);
             },
         })
@@ -47,7 +48,7 @@ export default function AuthPage() {
         signin.mutate({ email, code: inputCode }, {
             onSuccess: (data) => {
 
-                alert("Sign in successfully");
+                toast.success("Sign in successfully");
                 localStorage.setItem("token", data.token);
                 localStorage.setItem("user", JSON.stringify(data.user));
 
@@ -55,7 +56,7 @@ export default function AuthPage() {
 
                 router.push("/boards");
             }, onError: () => {
-                alert("Invalid code");
+                toast.error("Invalid code");
             }
         })
     }

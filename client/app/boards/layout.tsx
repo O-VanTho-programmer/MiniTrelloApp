@@ -1,5 +1,6 @@
 import { UserProvider } from "@/provider/UserProvider";
 import HeaderBar from "../components/board/HeaderBar";
+import { Toaster } from "react-hot-toast";
 
 export default function BoardLayout({
     children,
@@ -8,6 +9,7 @@ export default function BoardLayout({
 }>) {
     return (
         <UserProvider>
+            <Toaster position="top-center" />
             <div className={`h-screen`}>
                 <HeaderBar />
                 {children}

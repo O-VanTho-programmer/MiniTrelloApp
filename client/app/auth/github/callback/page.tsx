@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+import toast from "react-hot-toast";
 import { FaSpinner } from "react-icons/fa";
 
 export default function GithubCallbackPage() {
@@ -15,7 +16,7 @@ export default function GithubCallbackPage() {
     useEffect(() => {
         const fetchAccessToken = async () => {
             if (!code) {
-                alert("No code");
+                toast.error("No code");
                 router.push("/auth");
             }
 
@@ -34,7 +35,7 @@ export default function GithubCallbackPage() {
                 router.push("/boards");
             } catch (error) {
                 console.log(error);
-                alert("Error getting access token from GitHub");
+                toast.error("Error getting access token from GitHub");
                 router.push("/auth");
             }
         };

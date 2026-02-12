@@ -10,6 +10,7 @@ import { TaskWithAssignedMember } from '@/types/Task'
 import TaskDetailModal from '../task/TaskDetailModal'
 import { Draggable, Droppable } from '@hello-pangea/dnd'
 import { socket } from '@/lib/socket'
+import toast from 'react-hot-toast'
 
 type CardContainerProps = {
     name: string
@@ -49,7 +50,7 @@ function CardContainer({ name, card_id }: CardContainerProps) {
             onSuccess: () => {
                 setIsCreatingTask(false);
             }, onError() {
-                alert('Failed to create task');
+                toast.error('Failed to create task');
             },
         })
     }
@@ -57,9 +58,9 @@ function CardContainer({ name, card_id }: CardContainerProps) {
     const handleDeleteCard = () => {
         deleteCardById.mutate({ id: card_id, board_id: id as string }, {
             onSuccess: () => {
-                // alert('Card deleted successfully');
+                toast.success('Card deleted successfully');
             }, onError() {
-                alert('Failed to delete card');
+                toast.error('Failed to delete card');
             },
         })
     }
@@ -73,7 +74,7 @@ function CardContainer({ name, card_id }: CardContainerProps) {
                 socket.emit("update_card_name_desc", { boardId: id as string, cardId: card_id, name, description })
             },
             onError: () => {
-                alert('Failed to edit card');
+                toast.error('Failed to edit card');
             },
         })
 

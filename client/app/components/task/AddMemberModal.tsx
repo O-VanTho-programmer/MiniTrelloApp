@@ -5,6 +5,7 @@ import { BiCheck } from 'react-icons/bi'
 import { useAssignMemberToTask, useUnassignMemberFromTask } from '@/hooks/useTasks'
 import { useParams } from 'next/navigation'
 import { socket } from '@/lib/socket'
+import toast from 'react-hot-toast'
 
 type AddMemberModalProps = {
     taskId: string
@@ -27,9 +28,10 @@ function AddMemberModal({ taskId, cardId, onClose, members, membersInTask }: Add
         }, {
             onSuccess: () => {
                 onClose();
-                alert("Member assigned successfully");
+                toast.success("Member assigned successfully");
             },
             onError: () => {
+                toast.error("Failed to assign member");
             }
         })
     }
@@ -40,7 +42,7 @@ function AddMemberModal({ taskId, cardId, onClose, members, membersInTask }: Add
         }, {
             onSuccess: () => {
                 onClose();
-                alert("Member unassigned successfully");
+                toast.success("Member unassigned successfully");
             }
         })
     }

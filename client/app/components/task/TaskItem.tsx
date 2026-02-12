@@ -3,6 +3,7 @@ import { socket } from '@/lib/socket';
 import { Task } from '@/types/Task'
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { BiCheck } from 'react-icons/bi';
 
 type TaskItemProps = {
@@ -39,7 +40,7 @@ function TaskItem({ item }: TaskItemProps) {
       },
       onError: () => {
         setIsDone(!isDone);
-        alert("Failed to update task");
+        toast.error("Failed to update task");
       }
     }
     )

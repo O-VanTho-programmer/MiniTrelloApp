@@ -17,6 +17,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Task } from '@/types/Task';
 import { useDragAndDropMoveTask, useUpdateTask } from '@/hooks/useTasks';
 import { socket } from '@/lib/socket';
+import toast from 'react-hot-toast';
 
 function BoardPage() {
     const { id } = useParams();
@@ -46,10 +47,10 @@ function BoardPage() {
             let newTasksInSourceCard = [...sourceTasks];
             let newTasksInDesCard = [...destTasks];
 
-            const movedTaskIndex = newTasksInSourceCard.findIndex(task => task.id === taskId);
+            // const movedTaskIndex = newTasksInSourceCard.findIndex(task => task.id === taskId);
 
-            const movedTask = newTasksInSourceCard[movedTaskIndex];
-            newTasksInSourceCard.splice(movedTaskIndex, 1);
+            const movedTask = newTasksInSourceCard[prevIndex];
+            newTasksInSourceCard.splice(prevIndex, 1);
             newTasksInDesCard.splice(newIndex, 0, movedTask);
 
             queryClient.setQueryData(['tasks_by_card_id', sourceCardId], newTasksInSourceCard);
@@ -60,7 +61,7 @@ function BoardPage() {
 
             queryClient.setQueryData(['tasks_by_card_id', cardId], (oldTasks: Task[]) => {
                 if (!oldTasks) return oldTasks;
-                
+
                 return oldTasks.map(task =>
                     task.id === taskId ? { ...task, status: status } : task
                 );
@@ -68,7 +69,7 @@ function BoardPage() {
         });
 
         socket.on("update_task_name_desc", ({ cardId, taskId, name, description }) => {
-            
+
             console.log(name, description)
             queryClient.setQueryData(['tasks_by_card_id', cardId], (oldTasks: Task[]) => {
                 if (!oldTasks) return oldTasks;
@@ -81,7 +82,7 @@ function BoardPage() {
 
         socket.on("update_card_name_desc", ({ cardId, name, description }) => {
             queryClient.setQueryData(['cards_by_board_id', id as string], (oldCards: any[]) => {
-                if (!oldCards) return oldCards; 
+                if (!oldCards) return oldCards;
 
                 return oldCards.map(card =>
                     card.id === cardId ? { ...card, name, description } : card
@@ -106,7 +107,7 @@ function BoardPage() {
                 setIsCreatingList(false);
             },
             onError: () => {
-                alert('Failed to create card');
+                toast.error('Failed to create card');
             }
         })
     }
@@ -116,7 +117,7 @@ function BoardPage() {
 
         updateStatusBoard.mutate({ id: id as string, isActive: false }, {
             onSuccess: () => {
-                alert('Board closed successfully');
+                toast.success('Board closed successfully');
                 router.push('/boards');
             }
         })
@@ -128,15 +129,14 @@ function BoardPage() {
         receiveIds.forEach((receiveId) => {
             sendInvite.mutate({ boardId: id as string, receiveId }, {
                 onSuccess: () => {
-                    console.log(`Invite sent to ${receiveId}`);
+                    toast.success(`Sent invitations`);
                 },
                 onError: () => {
-                    alert(`Failed to send invite to user ID: ${receiveId}`);
+                    toast.error(`Failed to send invite to user ID: ${receiveId}`);
                 }
             });
         });
 
-        alert(`Sent invitations`);
         setOpenInviteMember(false);
         setSearchedUsers(null);
     }

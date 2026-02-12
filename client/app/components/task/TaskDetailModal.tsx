@@ -14,6 +14,7 @@ import { socket } from '@/lib/socket';
 import ListAttachmentsModal from '../repository/ListAttachmentsModal';
 import AttachmentCard from '../repository/AttachmentCard';
 import { Attachment } from '@/types/GithubRepo';
+import toast from 'react-hot-toast';
 
 type TaskDetailModalProps = {
     task: Task
@@ -57,11 +58,11 @@ export default function TaskDetailModal({ isOpen, cardName, cardId, task, onClos
         deleteTask.mutate({ id: task.id, board_id: id as string, card_id: cardId }, {
             onSuccess: () => {
                 socket.emit("update_task", { boardId: id as string, cardId: cardId })
-                alert('Task deleted successfully');
+                toast.success('Task deleted successfully');
                 onClose();
             },
             onError: () => {
-                alert('Failed to delete task');
+                toast.error('Failed to delete task');
             }
         })
     }
@@ -86,7 +87,7 @@ export default function TaskDetailModal({ isOpen, cardName, cardId, task, onClos
             id: task.id, board_id: id as string, card_id: cardId, attachment_id: attachment.id
         }, {
             onSuccess: () => {
-                alert('Attachment deleted successfully');
+                toast.success('Attachment deleted successfully');
             }
         })
     }
@@ -103,7 +104,7 @@ export default function TaskDetailModal({ isOpen, cardName, cardId, task, onClos
             card_id: task.card_id, board_id: id as string
         }, {
             onSuccess: () => {
-                alert("Task updated successfully");
+                toast.success("Task updated successfully");
                 socket.emit("update_task_name_desc", { boardId: id as string, cardId: cardId, taskId: task.id, name, description})
             }
         })

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { FaTimes } from 'react-icons/fa';
 import Button from '../ui/Button/Button';
+import toast from 'react-hot-toast';
 
 type Props = {
     isOpen: boolean
@@ -33,7 +34,7 @@ function FormNewCard({
         if (name.trim().length > 0) {
             onSubmit(name, description);
         } else {
-            alert('Name is required')
+            toast.error('Name is required')
         }
     }
 

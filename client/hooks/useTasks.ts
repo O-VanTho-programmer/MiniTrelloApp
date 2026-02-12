@@ -1,5 +1,6 @@
 import { assignMemberToTask, attachFromGithub, createTaskWithInCard, deleteAttachment, deleteTask, dragAndDropMoveTask, getAssignedMemberFromTask, getAttachmentsByTaskId, getTaskById, getTasksByCardId, unassignMemberFromTask, updateTask } from "@/services/task"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import toast from "react-hot-toast"
 
 export const useGetTasksByCardId = (card_id: string, board_id: string) => {
     return useQuery({
@@ -41,7 +42,7 @@ export const useUpdateTask = () => {
                 card_id: string, board_id: string
             }) => updateTask(id, name, description, status, card_id, board_id),
         onError: (_, { card_id }) => {
-            alert("Something went wrong")
+            toast.error("Something went wrong")
             queryClient.invalidateQueries({ queryKey: ["tasks_by_card_id", card_id] })
         }
     })
@@ -109,7 +110,7 @@ export const useDragAndDropMoveTask = () => {
         },
         onError: (error, { sourceCardId, destinationCardId }) => {
             console.error('Error moving task:', error);
-            alert("Something went wrong");
+            toast.error("Something went wrong");
             queryClient.invalidateQueries({ queryKey: ["tasks_by_card_id", sourceCardId] })
             if (sourceCardId !== destinationCardId) {
                 queryClient.invalidateQueries({ queryKey: ["tasks_by_card_id", destinationCardId] })

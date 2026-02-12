@@ -7,6 +7,7 @@ import Link from "next/link";
 import { BsPlus } from "react-icons/bs";
 import ModalNewBoard from "../components/board/ModalNewBoard";
 import { useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 export default function BoardsManagementPage() {
     const { data: boards, isLoading, isError, error } = useGetBoardsByUser();
@@ -20,11 +21,11 @@ export default function BoardsManagementPage() {
             {
                 onSuccess: () => {
                     queryClient.invalidateQueries({ queryKey: ["boardsByUser"] });
-                    alert("Board created successfully");
+                    toast.success("Board created successfully");
                     setOpenModal(false);
                 },
                 onError: () => {
-                    alert("Failed to create board");
+                    toast.error("Failed to create board");
                 }
             }
         );

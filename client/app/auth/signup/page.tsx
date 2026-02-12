@@ -4,6 +4,7 @@ import { useSendCodeSignup, useSignUp } from '@/hooks/useAuth';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react'
+import toast from 'react-hot-toast';
 
 
 function signupPage() {
@@ -25,7 +26,7 @@ function signupPage() {
 
         sendCode.mutate({ email }, {
             onSuccess: () => {
-                alert("Code sent successfully");
+                toast.success("Code sent successfully");
                 setOpenVerifyCode(true);
             },
         })
@@ -35,7 +36,7 @@ function signupPage() {
         if (inputCode) {
             signup.mutate({ name, email, code: inputCode }, {
                 onSuccess: (data) => {
-                    alert("Sign up successfully");
+                    toast.success("Sign up successfully");
                     queryClient.invalidateQueries({ queryKey: ["user"] });
 
                     localStorage.setItem("token", data.token);

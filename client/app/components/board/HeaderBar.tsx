@@ -9,6 +9,7 @@ import { BiBell, BiCheck, BiTrash, BiX } from "react-icons/bi"
 import Avatar from "../ui/Avatar";
 import { useRouter } from "next/navigation";
 import Button from "../ui/Button/Button";
+import toast from "react-hot-toast";
 
 function HeaderBar() {
     const router = useRouter();
@@ -48,7 +49,7 @@ function HeaderBar() {
     const handleAcceptInvitation = (invitation: InvitationWithSenderName) => {
         acceptInvite.mutate({ inviteId: invitation.id }, {
             onSuccess: () => {
-                alert("Invitation accepted successfully");
+                toast.success("Invitation accepted successfully");
             }
         })
     }
@@ -56,7 +57,7 @@ function HeaderBar() {
     const handleRejectInvitation = (invitation: InvitationWithSenderName) => {
         declineInvite.mutate({ inviteId: invitation.id }, {
             onSuccess: () => {
-                alert("Invitation declined successfully");
+                toast.success("Invitation declined successfully");
             }
         })
     }
@@ -64,7 +65,7 @@ function HeaderBar() {
     const handleDeleteInvitation = (invitation: InvitationWithSenderName) => {
         deleteInvite.mutate({ inviteId: invitation.id }, {
             onSuccess: () => {
-                alert("Invitation deleted successfully");
+                toast.success("Invitation deleted successfully");
             }
         })
     }

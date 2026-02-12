@@ -1,5 +1,6 @@
 import { createCard, deleteCard, getCardsByBoardId, updateCard } from "@/services/card"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import toast from "react-hot-toast"
 
 export const useGetCardsByBoardId = (board_id: string) => {
     return useQuery({
@@ -17,7 +18,7 @@ export const useCreateCard = () => {
         onSuccess: async (_, { board_id }) => await queryClient.invalidateQueries({
             queryKey: ["cards_by_board_id", board_id]
         }),
-        onError: () => alert("Something went wrong")
+        onError: () => toast.error("Something went wrong")
     })
 }
 
@@ -41,7 +42,7 @@ export const useEditCard = () => {
             return await updateCard(id, board_id, name, description)
         },
         onError: (_, { board_id }) => {
-            alert("Something went wrong")
+            toast.error("Something went wrong")
             queryClient.invalidateQueries({ queryKey: ["cards_by_board_id", board_id] })
         },
     })
