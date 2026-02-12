@@ -111,7 +111,9 @@ export const useDragAndDropMoveTask = () => {
             console.error('Error moving task:', error);
             alert("Something went wrong");
             queryClient.invalidateQueries({ queryKey: ["tasks_by_card_id", sourceCardId] })
-            queryClient.invalidateQueries({ queryKey: ["tasks_by_card_id", destinationCardId] })
+            if (sourceCardId !== destinationCardId) {
+                queryClient.invalidateQueries({ queryKey: ["tasks_by_card_id", destinationCardId] })
+            }
         }
     })
 }
