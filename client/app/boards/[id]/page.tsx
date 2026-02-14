@@ -40,21 +40,39 @@ function BoardPage() {
         socket.emit("join_board", id);
 
         socket.on("task_move", ({ taskId, sourceCardId, destCardId, prevIndex, newIndex }) => {
+            if (sourceCardId === destCardId && prevIndex === newIndex) {
+                return;
+            }
+
             const sourceTasks = queryClient.getQueryData<Task[]>(['tasks_by_card_id', sourceCardId]) || [];
-            const destTasks = sourceCardId === destCardId ? (sourceTasks)
-                : (queryClient.getQueryData<Task[]>(['tasks_by_card_id', destCardId]) || []);
 
-            let newTasksInSourceCard = [...sourceTasks];
-            let newTasksInDesCard = [...destTasks];
+            if (sourceCardId === destCardId) {
+                if (prevIndex === newIndex) {
+                    return;
+                }
 
-            // const movedTaskIndex = newTasksInSourceCard.findIndex(task => task.id === taskId);
+                const newTasks = [...sourceTasks];
+                const movedTask = newTasks[prevIndex];
+                newTasks.splice(prevIndex, 1);
+                newTasks.splice(newIndex, 0, movedTask);
 
-            const movedTask = newTasksInSourceCard[prevIndex];
-            newTasksInSourceCard.splice(prevIndex, 1);
-            newTasksInDesCard.splice(newIndex, 0, movedTask);
+                queryClient.setQueryData(['tasks_by_card_id', sourceCardId], newTasks);
+            } else {
+                const destTasks = queryClient.getQueryData<Task[]>(['tasks_by_card_id', destCardId]) || [];
 
-            queryClient.setQueryData(['tasks_by_card_id', sourceCardId], newTasksInSourceCard);
-            if (sourceCardId !== destCardId) queryClient.setQueryData(['tasks_by_card_id', destCardId], newTasksInDesCard);
+                const newSourceTasks = [...sourceTasks];
+                const newDestTasks = [...destTasks];
+
+                const movedTask = newSourceTasks[prevIndex];
+
+                const updatedMovedTask = {...movedTask, card_id: destCardId };
+
+                newSourceTasks.splice(prevIndex, 1);
+                newDestTasks.splice(newIndex, 0, updatedMovedTask);
+
+                queryClient.setQueryData(['tasks_by_card_id', sourceCardId], newSourceTasks);
+                queryClient.setQueryData(['tasks_by_card_id', destCardId], newDestTasks);
+            }
         });
 
         socket.on("update_task", ({ cardId, taskId, status }) => {
@@ -128,15 +146,12 @@ function BoardPage() {
 
         receiveIds.forEach((receiveId) => {
             sendInvite.mutate({ boardId: id as string, receiveId }, {
-                onSuccess: () => {
-                    toast.success(`Sent invitations`);
-                },
                 onError: () => {
                     toast.error(`Failed to send invite to user ID: ${receiveId}`);
                 }
             });
         });
-
+        toast.success('Invite sent successfully');
         setOpenInviteMember(false);
         setSearchedUsers(null);
     }

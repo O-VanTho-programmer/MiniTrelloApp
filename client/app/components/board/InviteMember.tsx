@@ -135,7 +135,7 @@ export default function InviteMember({
           )}
         </div>
 
-        {/* Selected Users (Tags) */}
+        {/* Selected Users */}
         {selectedUsers.length > 0 && (
           <div className="space-y-2">
             <label className="block text-xs font-semibold text-gray-500 uppercase">
@@ -145,7 +145,7 @@ export default function InviteMember({
               {selectedUsers.map(u => (
                 <div key={u.id} className="flex items-center gap-1.5 bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
                   {u.name}
-                  <button onClick={() => handleRemoveSelected(u.id)} className="hover:text-blue-900">
+                  <button onClick={() => handleRemoveSelected(u.id)} className="cursor-pointer hover:text-blue-900">
                     <FaTimesCircle />
                   </button>
                 </div>
