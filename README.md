@@ -76,6 +76,19 @@ The backend follows the **Model–View–Controller (MVC)** pattern.
 
 ---
 
+## Redis Write-Back Strategy
+
+To optimize database operations and reduce the load on Firebase Firestore, the backend implements a **Redis Write-Back** caching strategy:
+
+- **Append-Only File (AOF) with Redis Streams:**  
+  Write operations are fast-queued into a Redis Stream (`write_aof`) rather than being executed directly against the database.
+- **Write Coalescing:**  
+  A background worker periodically reads operations from the stream in batches. If multiple updates target the same document within a single batch window, they are intelligently merged (coalesced) to form the final document state.
+- **Batch Updates:**  
+  The coalesced updates are then written to Firestore concurrently using a bulk batch commit (`db.batch()`). This significantly reduces total database write operations, minimizes latency, and lowers Firestore billing costs.
+
+---
+
 ### Prerequisites
 
 Before running the project, make sure you have:
