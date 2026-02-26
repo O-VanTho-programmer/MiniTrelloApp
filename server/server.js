@@ -5,6 +5,7 @@ const { Server } = require("socket.io");
 const cors = require('cors');
 const { createClient } = require('redis');
 const { createAdapter } = require('@socket.io/redis-adapter');
+const redisWriteBackService = require('./services/redisWriteBackService');
 
 const corsOptions = {
     origin: `${process.env.CLIENT_URL || 'http://localhost:3000'}`,
@@ -42,6 +43,9 @@ async function startServer() {
             pubClient.connect(),
             subClient.connect()
         ]);
+
+        await redisWriteBackService.init(redisClient);
+        redisWriteBackService.startBatchProcessor(5000);
 
         io.adapter(createAdapter(pubClient, subClient));
 

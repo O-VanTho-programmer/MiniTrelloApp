@@ -1,5 +1,6 @@
 const { db } = require("../config/db");
 const { FieldValue } = require("firebase-admin/firestore");
+const redisWriteBackService = require("../services/redisWriteBackService");
 class Task {
     constructor(id, name, description, status, card_id, board_id, order_number, owner_id, member_ids, create_at) {
         this.id = id;
@@ -85,7 +86,7 @@ class Task {
     }
 
     static async updateWithInCard(taskId, data) {
-        await db.collection('tasks').doc(taskId).update(data);
+        await redisWriteBackService.queueUpdate('tasks', taskId, data);
         return { id: taskId, ...data };
     }
 
@@ -125,8 +126,6 @@ class Task {
     }
 
     static async dragAndDropMove(taskId, sourceCard, desCard, newIndex) {
-        const transaction = db.batch();
-
         if (sourceCard === desCard) {
             const tasksInCardSnap = await db.collection('tasks').where('card_id', '==', sourceCard).orderBy('order_number', 'asc').get();
             const tasksInCard = tasksInCardSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -136,9 +135,9 @@ class Task {
             tasksInCard.splice(tasksInCard.indexOf(movedTask), 1);
             tasksInCard.splice(newIndex, 0, movedTask);
 
-            tasksInCard.forEach((task, index) => {
-                transaction.update(db.collection('tasks').doc(task.id), { order_number: index });
-            });
+            for (let i = 0; i < tasksInCard.length; i++) {
+                await redisWriteBackService.queueUpdate('tasks', tasksInCard[i].id, { order_number: i });
+            }
         } else {
 
             const [tasksInSourceCardSnap, tasksInDesCardSnap] = await Promise.all([
@@ -153,21 +152,19 @@ class Task {
             tasksInSourceCard.splice(tasksInSourceCard.indexOf(movedTask), 1);
             tasksInDesCard.splice(newIndex, 0, movedTask);
 
+            for (let i = 0; i < tasksInSourceCard.length; i++) {
+                await redisWriteBackService.queueUpdate('tasks', tasksInSourceCard[i].id, { order_number: i });
+            }
 
-            tasksInSourceCard.forEach((task, index) => {
-                transaction.update(db.collection('tasks').doc(task.id), { order_number: index });
-            })
-
-            tasksInDesCard.forEach((task, index) => {
-                const update = { order_number: index };
-                if (task.id === movedTask.id) {
+            for (let i = 0; i < tasksInDesCard.length; i++) {
+                const update = { order_number: i };
+                if (tasksInDesCard[i].id === movedTask.id) {
                     update.card_id = desCard;
                 }
-                transaction.update(db.collection('tasks').doc(task.id), update);
-            });
+                await redisWriteBackService.queueUpdate('tasks', tasksInDesCard[i].id, update);
+            }
         }
 
-        await transaction.commit();
         return true;
     }
 }

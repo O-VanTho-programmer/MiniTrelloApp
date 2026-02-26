@@ -1,0 +1,26 @@
+name: build-module
+description: Automates the end-to-end creation and review of a new Node.js MVC module.
+trigger: /build-module
+
+steps:
+  - step: 1
+    name: Gather Requirements
+    action: prompt_user
+    message: "What is the Entity name, what are the database fields, and which database (MongoDB/MySQL/Firebase) are you using?"
+
+  - step: 2
+    name: Scaffold Code
+    action: trigger_skill
+    skill: nodejs-mvc-scaffold
+    context: "Use the inputs from Step 1 to generate the Fat Model, Skinny Controller, and Routes."
+
+  - step: 3
+    name: Review Architecture
+    action: trigger_skill
+    skill: mvc-architecture-reviewer
+    context: "Review the files generated in Step 2 to ensure they strictly follow the 'Fat Model, Skinny Controller' pattern."
+
+  - step: 4
+    name: Final Report
+    action: respond
+    message: "🚀 The new module has been successfully built, reviewed, and injected into your server.js file!"
