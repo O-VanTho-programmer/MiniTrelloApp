@@ -216,7 +216,7 @@ function BoardPage() {
         }
 
         moveTask.mutate({ id: taskId, sourceCardId, destinationCardId, newIndex: newIndexOfTask });
-
+        
         socket.emit("task_move", { boardId: id as string, taskId, sourceCardId, destCardId: destinationCardId, prevIndex: prevIndexOfTask, newIndex: newIndexOfTask });
     }
     if (isLoadingCards) {
