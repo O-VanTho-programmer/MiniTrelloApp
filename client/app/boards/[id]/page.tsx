@@ -120,7 +120,7 @@ function BoardPage() {
             socket.off('update_card_name_desc');
             socket.disconnect();
         };
-    }, [id])
+    }, [id, queryClient])
 
     const handleCreateCard = (name: string) => {
         createCard.mutate({ name, board_id: id as string }, {
@@ -212,7 +212,9 @@ function BoardPage() {
             const taskInPrevIndex = tasksInSourceCard[prevIndexOfTask];
             newTasksInSourceCard.splice(prevIndexOfTask, 1);
 
-            newTasksInDesCard.splice(newIndexOfTask, 0, taskInPrevIndex);
+            // Update task's card_id when moving between cards - prevents stale state and broken subsequent drags
+            const movedTaskWithNewCard = { ...taskInPrevIndex, card_id: destinationCardId };
+            newTasksInDesCard.splice(newIndexOfTask, 0, movedTaskWithNewCard);
 
             queryClient.setQueryData(['tasks_by_card_id', sourceCardId], newTasksInSourceCard);
             queryClient.setQueryData(['tasks_by_card_id', destinationCardId], newTasksInDesCard);

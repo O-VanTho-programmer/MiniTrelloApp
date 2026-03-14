@@ -99,8 +99,10 @@ class Task {
     static async updateWithInCard(taskId, data, userId) {
         const task = await db.collection('tasks').doc(taskId).get();
         if (!task.exists) return null;
-        
-        await redisWriteBackService.queueUpdate('tasks', taskId, data);
+
+        // Status changes need immediate persistence for instant checkbox feedback
+        const immediate = data.hasOwnProperty('status');
+        await redisWriteBackService.queueUpdate('tasks', taskId, data, immediate);
 
         if (userId) {
             await ActivityLog.create({

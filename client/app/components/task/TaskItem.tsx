@@ -2,7 +2,7 @@ import { useUpdateTask } from '@/hooks/useTasks';
 import { socket } from '@/lib/socket';
 import { Task } from '@/types/Task'
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { BiCheck } from 'react-icons/bi';
 
@@ -12,22 +12,22 @@ type TaskItemProps = {
 
 function TaskItem({ item }: TaskItemProps) {
   const { id: board_id } = useParams();
-  const [isDone, setIsDone] = useState(item.status === 'Done');
+  const queryClient = useQueryClient();
+  const isDone = item.status === 'Done';
   const updateTask = useUpdateTask();
 
-  useEffect(() => {
-    setIsDone(item.status === 'Done');
-  }, [item.status])
-  
-  console.log("Render Task", item.id);
-
   const handleToggleDone = () => {
-    setIsDone(!isDone);
+    const newStatus = isDone ? "Pending" : "Done";
+
+    // Optimistic update - instant UI feedback
+    queryClient.setQueryData<Task[]>(['tasks_by_card_id', item.card_id], (old) =>
+      old?.map((t) => t.id === item.id ? { ...t, status: newStatus } : t) ?? old
+    );
 
     updateTask.mutate(
       {
         id: item.id, name: item.name,
-        description: item.description || "", status: isDone ? "Pending" : "Done",
+        description: item.description || "", status: newStatus,
         card_id: item.card_id, board_id: board_id as string
       }, {
       onSuccess: () => {
@@ -35,11 +35,13 @@ function TaskItem({ item }: TaskItemProps) {
           boardId: board_id,
           cardId: item.card_id,
           taskId: item.id,
-          status: isDone ? "Pending" : "Done"
+          status: newStatus
         });
       },
       onError: () => {
-        setIsDone(!isDone);
+        queryClient.setQueryData<Task[]>(['tasks_by_card_id', item.card_id], (old) =>
+          old?.map((t) => t.id === item.id ? { ...t, status: item.status } : t) ?? old
+        );
         toast.error("Failed to update task");
       }
     }

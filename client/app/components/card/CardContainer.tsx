@@ -1,7 +1,7 @@
 import { FaPlus, FaTimes } from 'react-icons/fa'
 import { useEffect, useRef, useState } from 'react'
 import FormNewList from './FormNewCard'
-import { BiMenu } from 'react-icons/bi'
+import { BiMenu, BiDotsVerticalRounded } from 'react-icons/bi'
 import { useDeleteCard, useEditCard } from '@/hooks/useCards'
 import { useParams } from 'next/navigation'
 import { useCreateTaskWithInCard, useDeleteTask, useGetTasksByCardId } from '@/hooks/useTasks'
@@ -138,12 +138,19 @@ function CardContainer({ name, card_id }: CardContainerProps) {
                                             <div
                                                 ref={provided.innerRef}
                                                 {...provided.draggableProps}
-                                                {...provided.dragHandleProps}
-                                                onClick={() => setSelectedTask(task)}
                                                 style={{ ...provided.draggableProps.style }}
-                                                className={`${snapshot.isDragging ? 'rotate-2 shadow-xl ring-2 ring-blue-400 z-50 rounded-md' : ''}`}
+                                                className={`flex items-stretch gap-1 ${snapshot.isDragging ? 'rotate-2 shadow-xl ring-2 ring-blue-400 z-50 rounded-md' : ''}`}
                                             >
-                                                <TaskItem item={task} />
+                                                <div
+                                                    {...provided.dragHandleProps}
+                                                    className="flex items-center justify-center w-6 shrink-0 cursor-grab active:cursor-grabbing text-gray-500 hover:text-gray-300 rounded"
+                                                    aria-label="Drag to reorder"
+                                                >
+                                                    <BiDotsVerticalRounded size={16} />
+                                                </div>
+                                                <div className="flex-1 min-w-0" onClick={() => setSelectedTask(task)}>
+                                                    <TaskItem item={task} />
+                                                </div>
                                             </div>
                                         )}
                                     </Draggable>

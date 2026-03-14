@@ -46,7 +46,7 @@ async function startServer() {
         ]);
 
         await redisWriteBackService.init(redisClient);
-        redisWriteBackService.startBatchProcessor(5000);
+        redisWriteBackService.startBatchProcessor(2000);
 
         io.adapter(createAdapter(pubClient, subClient));
 

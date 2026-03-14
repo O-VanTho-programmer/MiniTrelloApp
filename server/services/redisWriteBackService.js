@@ -23,9 +23,17 @@ class RedisWriteBackService {
         }
     }
 
-    async queueUpdate(collectionName, documentId, data) {
-        if (!this.redisClient) {
-            console.warn('Redis client not initialized for Write Back. Writing directly to DB.');
+    /**
+     * @param {string} collectionName
+     * @param {string} documentId
+     * @param {object} data
+     * @param {boolean} [immediate=false] - If true, writes directly to Firestore (bypasses Redis queue). Use for status toggles, etc. that need instant feedback.
+     */
+    async queueUpdate(collectionName, documentId, data, immediate = false) {
+        if (immediate || !this.redisClient) {
+            if (!this.redisClient) {
+                console.warn('Redis client not initialized for Write Back. Writing directly to DB.');
+            }
             await db.collection(collectionName).doc(documentId).update(data);
             return;
         }
