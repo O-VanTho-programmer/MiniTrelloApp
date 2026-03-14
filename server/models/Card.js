@@ -1,4 +1,5 @@
 const { db } = require("../config/db");
+const ActivityLog = require("./ActivityLog");
 
 class Card {
   constructor(id, name, description, board_id, order_number, create_at) {
@@ -10,7 +11,7 @@ class Card {
     this.create_at = create_at;
   }
 
-  static async create(name, description, board_id) {
+  static async create(name, description, board_id, userId) {
 
     const maxOrderNumberSnap = await db.collection('cards').where('board_id', '==', board_id).orderBy('order_number', 'desc').limit(1).get();
     let maxOrderNumber = -1
@@ -27,6 +28,18 @@ class Card {
     }
 
     const card = await db.collection("cards").add(dto);
+
+    if (userId) {
+        await ActivityLog.create({
+            boardId: board_id,
+            userId: userId,
+            action: 'CREATE',
+            entityType: 'CARD',
+            entityId: card.id,
+            details: `Created list: ${name}`
+        });
+    }
+
     return new Card(card.id, dto.name, dto.description, dto.board_id, dto.order_number, dto.create_at);
   }
 
@@ -74,13 +87,46 @@ class Card {
     return res;
   }
 
-  static async update(id, data) {
+  static async update(id, data, userId) {
+    const card = await db.collection("cards").doc(id).get();
+    if (!card.exists) return null;
+    const boardId = card.data().board_id;
+
     await db.collection("cards").doc(id).update(data);
+
+    if (userId) {
+        await ActivityLog.create({
+            boardId: boardId,
+            userId: userId,
+            action: 'UPDATE',
+            entityType: 'CARD',
+            entityId: id,
+            details: `Updated list: ${data.name || 'details'}`
+        });
+    }
+
     return { id, ...data };
   }
 
-  static async delete(id) {
+  static async delete(id, userId) {
+    const card = await db.collection("cards").doc(id).get();
+    if (!card.exists) return false;
+    const boardId = card.data().board_id;
+    const cardName = card.data().name;
+
     await db.collection("cards").doc(id).delete();
+
+    if (userId) {
+        await ActivityLog.create({
+            boardId: boardId,
+            userId: userId,
+            action: 'DELETE',
+            entityType: 'CARD',
+            entityId: id,
+            details: `Deleted list: ${cardName}`
+        });
+    }
+
     return true;
   }
 

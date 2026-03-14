@@ -45,8 +45,9 @@ exports.updateTaskWithInCard = async (req, res) => {
     try {
         const taskId = req.params.taskId;
         const { name, description, status } = req.body;
+        const userId = req.user.id;
 
-        const task = await Task.updateWithInCard(taskId, { name, description, status });
+        const task = await Task.updateWithInCard(taskId, { name, description, status }, userId);
 
         res.status(200).json(task);
     } catch (error) {
@@ -58,8 +59,9 @@ exports.updateTaskWithInCard = async (req, res) => {
 exports.deleteTaskWithInCard = async (req, res) => {
     try {
         const taskId = req.params.taskId;
+        const userId = req.user.id;
 
-        await Task.deleteWithInCard(taskId);
+        await Task.deleteWithInCard(taskId, userId);
 
         res.status(204).json();
     } catch (error) {
@@ -72,8 +74,9 @@ exports.assignMemberToTaskWithInCard = async (req, res) => {
     try {
         const {memberId} = req.body;
         const taskId = req.params.taskId;
+        const userId = req.user.id;
 
-        const task = await Task.assignMember(taskId, memberId)
+        const task = await Task.assignMember(taskId, memberId, userId)
 
         res.status(201).json(task);
     } catch (error) {
@@ -86,8 +89,9 @@ exports.unassignMemberToTaskWithInCard = async (req, res) => {
     try {
         const memberId = req.params.memberId;
         const taskId = req.params.taskId;
+        const userId = req.user.id;
 
-        const task = await Task.unassignMember(taskId, memberId);
+        const task = await Task.unassignMember(taskId, memberId, userId);
 
         if(!task) throw new Error("Error unassign member");
 
@@ -120,7 +124,8 @@ exports.dragAndDropMove = async (req, res) => {
     try {
         const taskId = req.params.taskId;
         const { sourceCardId, destinationCardId, newIndex } = req.body;
-        const task = await Task.dragAndDropMove(taskId, sourceCardId, destinationCardId, newIndex);
+        const userId = req.user.id;
+        const task = await Task.dragAndDropMove(taskId, sourceCardId, destinationCardId, newIndex, userId);
 
         res.status(200).json(task);
     } catch (error) {

@@ -10,8 +10,10 @@ import CardContainer from '@/app/components/card/CardContainer';
 import { useGetMembers, useUpdateStatusBoard } from '@/hooks/useBoards';
 import { useSendInvitation } from '@/hooks/useInvitation';
 import InviteMember from '@/app/components/board/InviteMember';
+import ActivityLogModal from '@/app/components/board/ActivityLogModal';
 import { User } from '@/types/User';
 import { getUserByEmailSearch } from '@/services/auth';
+import { FaHistory } from 'react-icons/fa';
 import { DragDropContext } from '@hello-pangea/dnd';
 import { useQueryClient } from '@tanstack/react-query';
 import { Task } from '@/types/Task';
@@ -29,6 +31,7 @@ function BoardPage() {
 
     const [isCreatingList, setIsCreatingList] = useState(false);
     const [openInviteMembers, setOpenInviteMember] = useState(false);
+    const [openActivityLog, setOpenActivityLog] = useState(false);
 
     const createCard = useCreateCard();
     const updateStatusBoard = useUpdateStatusBoard();
@@ -232,10 +235,16 @@ function BoardPage() {
                 <header className='flex justify-between items-center px-4 py-2 bg-pink-600 text-white'>
                     <h3 className=''>My Trello board</h3>
 
-                    <button onClick={() => setOpenInviteMember(true)} className="flex items-center gap-2 bg-black hover:bg-gray-800 px-3 py-1.5 rounded text-sm font-medium cursor-pointer">
-                        <FaUserPlus size={14} />
-                        <span>Invite member</span>
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <button onClick={() => setOpenActivityLog(true)} className="flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm px-3 py-1.5 rounded text-sm font-medium cursor-pointer transition-colors">
+                            <FaHistory size={14} />
+                            <span>Activity</span>
+                        </button>
+                        <button onClick={() => setOpenInviteMember(true)} className="flex items-center gap-2 bg-black hover:bg-gray-800 px-3 py-1.5 rounded text-sm font-medium cursor-pointer">
+                            <FaUserPlus size={14} />
+                            <span>Invite member</span>
+                        </button>
+                    </div>
 
                 </header>
 
@@ -281,6 +290,12 @@ function BoardPage() {
                     alreadyMembers={membersInBoard || []}
                 />
             )}
+
+            <ActivityLogModal 
+                boardId={id as string} 
+                isOpen={openActivityLog} 
+                onClose={() => setOpenActivityLog(false)} 
+            />
         </div>
     )
 }

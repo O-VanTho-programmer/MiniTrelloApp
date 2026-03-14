@@ -1,6 +1,7 @@
 const { db } = require("../config/db");
 const { FieldValue } = require("firebase-admin/firestore");
 const redisWriteBackService = require("../services/redisWriteBackService");
+const ActivityLog = require("./ActivityLog");
 class Task {
     constructor(id, name, description, status, card_id, board_id, order_number, owner_id, member_ids, create_at) {
         this.id = id;
@@ -70,6 +71,16 @@ class Task {
 
 
         const newTask = await db.collection('tasks').add(dto);
+
+        await ActivityLog.create({
+            boardId: boardId,
+            userId: ownerId,
+            action: 'CREATE',
+            entityType: 'TASK',
+            entityId: newTask.id,
+            details: `Created task: ${name}`
+        });
+
         return new Task(newTask.id, dto.name, dto.description, dto.card_id, dto.board_id, dto.order_number, dto.owner_id, dto.member_ids, dto.create_at);
     }
 
@@ -85,22 +96,69 @@ class Task {
         return new Task(task.id, data.name, data.description, data.status, data.card_id, data.board_id, data.order_number, data.owner_id, data.member_ids, data.create_at);
     }
 
-    static async updateWithInCard(taskId, data) {
+    static async updateWithInCard(taskId, data, userId) {
+        const task = await db.collection('tasks').doc(taskId).get();
+        if (!task.exists) return null;
+        
         await redisWriteBackService.queueUpdate('tasks', taskId, data);
+
+        if (userId) {
+            await ActivityLog.create({
+                boardId: task.data().board_id,
+                userId: userId,
+                action: 'UPDATE',
+                entityType: 'TASK',
+                entityId: taskId,
+                details: `Updated task: ${data.name || 'details'}`
+            });
+        }
+
         return { id: taskId, ...data };
     }
 
-    static async deleteWithInCard(taskId) {
+    static async deleteWithInCard(taskId, userId) {
+        const task = await db.collection('tasks').doc(taskId).get();
+        if(!task.exists) return false;
+
+        const boardId = task.data().board_id;
+        const taskName = task.data().name;
+
         await db.collection('tasks').doc(taskId).delete();
+
+        if (userId) {
+            await ActivityLog.create({
+                boardId: boardId,
+                userId: userId,
+                action: 'DELETE',
+                entityType: 'TASK',
+                entityId: taskId,
+                details: `Deleted task: ${taskName}`
+            });
+        }
+
         return true;
     }
 
-    static async assignMember(taskId, memberId) {
+    static async assignMember(taskId, memberId, userId) {
+        const taskSnap = await db.collection("tasks").doc(taskId).get();
+        if (!taskSnap.exists) return null;
+
         const task = await db.collection("tasks").doc(taskId).set({
             member_ids: FieldValue.arrayUnion(memberId)
         }, {
             merge: true
         });
+
+        if (userId) {
+            await ActivityLog.create({
+                boardId: taskSnap.data().board_id,
+                userId: userId,
+                action: 'ASSIGN',
+                entityType: 'TASK',
+                entityId: taskId,
+                details: `Assigned member to task`
+            });
+        }
 
         return task;
     }
@@ -117,20 +175,37 @@ class Task {
         return memberIds;
     }
 
-    static async unassignMember(taskId, memberId) {
+    static async unassignMember(taskId, memberId, userId) {
+        const taskSnap = await db.collection("tasks").doc(taskId).get();
+        if (!taskSnap.exists) return false;
+
         const task = await db.collection("tasks").doc(taskId).set({
             member_ids: FieldValue.arrayRemove(memberId)
         }, { merge: true });
 
+        if (userId) {
+            await ActivityLog.create({
+                boardId: taskSnap.data().board_id,
+                userId: userId,
+                action: 'UNASSIGN',
+                entityType: 'TASK',
+                entityId: taskId,
+                details: `Unassigned member from task`
+            });
+        }
+
         return true;
     }
 
-    static async dragAndDropMove(taskId, sourceCard, desCard, newIndex) {
+    static async dragAndDropMove(taskId, sourceCard, desCard, newIndex, userId) {
+        let boardId = null;
+
         if (sourceCard === desCard) {
             const tasksInCardSnap = await db.collection('tasks').where('card_id', '==', sourceCard).orderBy('order_number', 'asc').get();
             const tasksInCard = tasksInCardSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
             const movedTask = tasksInCard.find(task => task.id === taskId);
+            if(movedTask) boardId = movedTask.board_id;
 
             tasksInCard.splice(tasksInCard.indexOf(movedTask), 1);
             tasksInCard.splice(newIndex, 0, movedTask);
@@ -149,6 +224,8 @@ class Task {
             const tasksInDesCard = tasksInDesCardSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
             const movedTask = tasksInSourceCard.find(task => task.id === taskId);
+            if(movedTask) boardId = movedTask.board_id;
+
             tasksInSourceCard.splice(tasksInSourceCard.indexOf(movedTask), 1);
             tasksInDesCard.splice(newIndex, 0, movedTask);
 
@@ -163,6 +240,17 @@ class Task {
                 }
                 await redisWriteBackService.queueUpdate('tasks', tasksInDesCard[i].id, update);
             }
+        }
+
+        if (userId && boardId) {
+            await ActivityLog.create({
+                boardId: boardId,
+                userId: userId,
+                action: 'MOVE',
+                entityType: 'TASK',
+                entityId: taskId,
+                details: `Moved task`
+            });
         }
 
         return true;

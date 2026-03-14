@@ -4,9 +4,9 @@ exports.newCard = async (req, res) => {
     try {
         const { name, description } = req.body;
         const board_id = req.params.boardId;
+        const userId = req.user.id;
 
-
-        const newCard = await Card.create(name, description, board_id);
+        const newCard = await Card.create(name, description, board_id, userId);
 
         res.status(201).json(newCard);
     } catch (error) {
@@ -44,13 +44,15 @@ exports.getCardsByUser = async (req, res) => {
 exports.updateCard = async (req, res) => {
     const cardId = req.params.id;
     const { name, description } = req.body;
+    const userId = req.user.id;
 
-    const card = await Card.update(cardId, { name, description });
+    const card = await Card.update(cardId, { name, description }, userId);
     res.status(200).json(card);
 }
 
 exports.deleteCard = async (req, res) => {
     const cardId = req.params.id;
-    await Card.delete(cardId);
+    const userId = req.user.id;
+    await Card.delete(cardId, userId);
     res.status(204).json();
 }
