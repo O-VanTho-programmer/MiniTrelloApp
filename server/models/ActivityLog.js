@@ -1,5 +1,5 @@
 const { db } = require("../config/db");
-const { v4: uuidv4 } = require('uuid');
+const crypto = require('crypto');
 const redisWriteBackService = require("../services/redisWriteBackService");
 
 class ActivityLog {
@@ -15,14 +15,14 @@ class ActivityLog {
     }
 
     static async create({ boardId, userId, action, entityType, entityId, details = '' }) {
-        const id = uuidv4();
+        const id = crypto.randomUUID();
         const dto = {
             board_id: boardId,
             user_id: userId,
             action: action,
             entity_type: entityType,
-            entity_id: entityId,
-            details: details,
+            entity_id: entityId || '',
+            details: details || '',
             created_at: new Date().toISOString()
         };
 

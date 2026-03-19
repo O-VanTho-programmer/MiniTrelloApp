@@ -126,7 +126,7 @@ exports.dragAndDropMove = async (req, res) => {
         const { sourceCardId, destinationCardId, newIndex } = req.body;
         const userId = req.user.id;
         const task = await Task.dragAndDropMove(taskId, sourceCardId, destinationCardId, newIndex, userId);
-
+        io.emit("task_move", { taskId, sourceCardId, destinationCardId, newIndex });
         res.status(200).json(task);
     } catch (error) {
         console.error("Error drag and drop move", error);

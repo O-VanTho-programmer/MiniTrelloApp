@@ -41,11 +41,12 @@ export const useUpdateTask = () => {
                 description: string, status: string,
                 card_id: string, board_id: string
             }) => updateTask(id, name, description, status, card_id, board_id),
-        onSuccess: (_, { card_id }) => queryClient.invalidateQueries({ queryKey: ["tasks_by_card_id", card_id] }),
-        onError: (_, { card_id }) => {
-            toast.error("Something went wrong")
-            queryClient.invalidateQueries({ queryKey: ["tasks_by_card_id", card_id] })
-        }
+        // We handle optimistic updates manually at the component level (TaskItem, TaskDetailModal)
+        // and broadcast changes via websockets, so we avoid extra refetches here to keep UI snappy.
+        onError: () => {
+            toast.error("Something went wrong");
+        },
+        retry: 0
     })
 }
 
@@ -105,20 +106,36 @@ export const useDragAndDropMoveTask = () => {
                 id: string, sourceCardId: string,
                 destinationCardId: string, newIndex: number
             }) => dragAndDropMoveTask(id, sourceCardId, destinationCardId, newIndex),
+        
+        onMutate: async (variables) => {
+            const { sourceCardId, destinationCardId } = variables;
 
+            await queryClient.cancelQueries({ queryKey: ['tasks_by_card_id'] });
+            
+            const previousSourceTasks = queryClient.getQueryData(['tasks_by_card_id', sourceCardId]);
+            const previousDestTasks = queryClient.getQueryData(['tasks_by_card_id', destinationCardId]);
+
+            return { previousSourceTasks, previousDestTasks, sourceCardId, destinationCardId };
+        },
         onSuccess: () => {
             console.log('Task moved successfully');
-
         },
-        onError: (error, { sourceCardId, destinationCardId }) => {
+
+        onError: (error, _, context) => { 
             console.error('Error moving task:', error);
             toast.error("Something went wrong");
-            
-            queryClient.invalidateQueries({ queryKey: ["tasks_by_card_id", sourceCardId] })
-            if (sourceCardId !== destinationCardId) {
-                queryClient.invalidateQueries({ queryKey: ["tasks_by_card_id", destinationCardId] })
+
+            if (context) {
+                queryClient.setQueryData(['tasks_by_card_id', context.sourceCardId], context.previousSourceTasks);
+                if (context.sourceCardId !== context.destinationCardId) {
+                    queryClient.setQueryData(['tasks_by_card_id', context.destinationCardId], context.previousDestTasks);
+                }
+                toast.error("Failed to move task. Reverting changes.");
             }
-        }
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({ queryKey: ['tasks_by_card_id'] });
+        },
     })
 }
 

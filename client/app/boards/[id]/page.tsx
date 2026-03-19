@@ -220,9 +220,7 @@ function BoardPage() {
             queryClient.setQueryData(['tasks_by_card_id', destinationCardId], newTasksInDesCard);
         }
 
-        moveTask.mutate({ id: taskId, sourceCardId, destinationCardId, newIndex: newIndexOfTask });
-        
-        socket.emit("task_move", { boardId: id as string, taskId, sourceCardId, destCardId: destinationCardId, prevIndex: prevIndexOfTask, newIndex: newIndexOfTask });
+        moveTask.mutate({ id: taskId, sourceCardId, destinationCardId, newIndex: newIndexOfTask });        
     }
     if (isLoadingCards) {
         return;

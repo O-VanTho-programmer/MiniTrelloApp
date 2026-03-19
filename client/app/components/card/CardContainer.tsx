@@ -6,11 +6,12 @@ import { useDeleteCard, useEditCard } from '@/hooks/useCards'
 import { useParams } from 'next/navigation'
 import { useCreateTaskWithInCard, useDeleteTask, useGetTasksByCardId } from '@/hooks/useTasks'
 import TaskItem from '../task/TaskItem'
-import { TaskWithAssignedMember } from '@/types/Task'
+import { Task, TaskWithAssignedMember } from '@/types/Task'
 import TaskDetailModal from '../task/TaskDetailModal'
 import { Draggable, Droppable } from '@hello-pangea/dnd'
 import { socket } from '@/lib/socket'
 import toast from 'react-hot-toast'
+import { useQueryClient } from '@tanstack/react-query'
 
 type CardContainerProps = {
     name: string
@@ -31,6 +32,22 @@ function CardContainer({ name, card_id }: CardContainerProps) {
     const createTask = useCreateTaskWithInCard();
 
     const listActionRef = useRef<HTMLDivElement>(null);
+    const queryClient = useQueryClient();
+
+    useEffect(() => {
+        socket.connect();
+
+        socket.on("task_move", ({ taskId, sourceCardId, destCardId, prevIndex, newIndex }) => {
+            console.log(taskId, sourceCardId, destCardId, prevIndex, newIndex);
+            queryClient.setQueryData(['tasks_by_card_id', card_id], (oldTasks: Task[]) => {
+                if (!oldTasks) return oldTasks;
+
+                return oldTasks.map(task =>
+                    task.id === taskId ? { ...task, status: status } : task
+                );
+            });
+        });
+    }, []);
 
     useEffect(() => {
         const handleOutsideClick = (event: MouseEvent) => {
