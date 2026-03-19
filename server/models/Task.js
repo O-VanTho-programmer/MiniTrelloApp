@@ -81,7 +81,7 @@ class Task {
             details: `Created task: ${name}`
         });
 
-        return new Task(newTask.id, dto.name, dto.description, dto.card_id, dto.board_id, dto.order_number, dto.owner_id, dto.member_ids, dto.create_at);
+        return new Task(newTask.id, dto.name, dto.description, dto.status, dto.card_id, dto.board_id, dto.order_number, dto.owner_id, dto.member_ids, dto.create_at);
     }
 
     static async getByIdWithInCard(taskId) {

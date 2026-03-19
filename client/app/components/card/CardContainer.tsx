@@ -82,7 +82,7 @@ function CardContainer({ name, card_id }: CardContainerProps) {
 
     return (
         <div className="min-w-[250px] max-w-72 flex-1 shrink-0">
-            <div className="bg-gray-800 rounded-xl p-3 shadow-sm">
+            <div className="bg-gray-800 rounded-xl max-h-[calc(100vh-100px)] p-3 shadow-sm overflow-y-scroll">
 
                 <div className='flex items-center justify-between mb-2'>
                     <h3 className="font-bold text-gray-200 text-sm">{name}</h3>

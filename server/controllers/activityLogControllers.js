@@ -3,9 +3,21 @@ const ActivityLog = require("../models/ActivityLog");
 exports.createLog = async (req, res) => {
     try {
         const { boardId, action, entityType, entityId, details } = req.body;
-        const userId = req.user.id; 
+        const userId = req.user.id;
 
         const log = await ActivityLog.create({ boardId, userId, action, entityType, entityId, details });
+
+        const socketId = req.headers['x-socket-id'];
+        const io = req.app.get('io');
+
+        if (io && boardId) {
+            if (socketId) {
+                io.to(boardId).except(socketId).emit("create_log", log);
+            } else {
+                io.to(boardId).emit("create_log", log);
+            }
+        }
+
         res.status(201).json(log);
     } catch (error) {
         console.error("Error creating activity log", error);

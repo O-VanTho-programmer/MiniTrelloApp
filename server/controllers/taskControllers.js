@@ -25,7 +25,7 @@ exports.createTaskWithInCard = async (req, res) => {
 
         const socketId = req.headers['x-socket-id'];
         const io = req.app.get('io');
-        
+
         if (io && boardId) {
             if (socketId) {
                 io.to(boardId).except(socketId).emit("create_task", task);
@@ -66,7 +66,7 @@ exports.updateTaskWithInCard = async (req, res) => {
 
         const socketId = req.headers['x-socket-id'];
         const io = req.app.get('io');
-        
+
         if (io && boardId) {
             if (socketId) {
                 io.to(boardId).except(socketId).emit("update_task", { cardId, taskId, status });
@@ -96,7 +96,7 @@ exports.deleteTaskWithInCard = async (req, res) => {
 
         const socketId = req.headers['x-socket-id'];
         const io = req.app.get('io');
-        
+
         if (io && boardId) {
             if (socketId) {
                 io.to(boardId).except(socketId).emit("update_task", { cardId });
@@ -114,7 +114,7 @@ exports.deleteTaskWithInCard = async (req, res) => {
 
 exports.assignMemberToTaskWithInCard = async (req, res) => {
     try {
-        const {memberId} = req.body;
+        const { memberId } = req.body;
         const taskId = req.params.taskId;
         const userId = req.user.id;
 
@@ -135,7 +135,7 @@ exports.unassignMemberToTaskWithInCard = async (req, res) => {
 
         const task = await Task.unassignMember(taskId, memberId, userId);
 
-        if(!task) throw new Error("Error unassign member");
+        if (!task) throw new Error("Error unassign member");
 
         res.status(204).json();
     } catch (error) {
@@ -168,10 +168,10 @@ exports.dragAndDropMove = async (req, res) => {
         const { boardId, sourceCardId, destinationCardId, prevIndex, newIndex } = req.body;
         const userId = req.user.id;
         const task = await Task.dragAndDropMove(taskId, sourceCardId, destinationCardId, newIndex, userId);
-        
+
         const socketId = req.headers['x-socket-id'];
         const io = req.app.get('io');
-        
+
         const payload = { taskId, sourceCardId, destCardId: destinationCardId, prevIndex, newIndex };
 
         if (io && boardId) {

@@ -15,7 +15,7 @@ exports.newCard = async (req, res) => {
             if (socketId) {
                 io.to(board_id).except(socketId).emit("create_card", newCard);
             } else {
-                io.to(boardId).emit("create_card", newCard);
+                io.to(board_id).emit("create_card", newCard);
             }
         }
 

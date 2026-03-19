@@ -91,7 +91,6 @@ function BoardPage() {
 
         socket.on("update_task_name_desc", ({ cardId, taskId, name, description }) => {
 
-            console.log(name, description)
             queryClient.setQueryData(['tasks_by_card_id', cardId], (oldTasks: Task[]) => {
                 if (!oldTasks) return oldTasks;
 
@@ -125,6 +124,14 @@ function BoardPage() {
                 if (!oldCards) return [newCard];
                 if (oldCards.some(c => c.id === newCard.id)) return oldCards;
                 return [...oldCards, newCard];
+            });
+        });
+
+        socket.on("create_log", (newLog) => {
+            queryClient.setQueryData(['activity_logs', id as string], (oldLogs: any[]) => {
+                if (!oldLogs) return [newLog];
+                if (oldLogs.some(l => l.id === newLog.id)) return oldLogs;
+                return [...oldLogs, newLog];
             });
         });
 

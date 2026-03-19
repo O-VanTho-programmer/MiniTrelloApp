@@ -41,6 +41,7 @@ export const useUpdateTask = () => {
                 description: string, status: string,
                 card_id: string, board_id: string
             }) => updateTask(id, name, description, status, card_id, board_id),
+        onSuccess: (_, { card_id }) => queryClient.invalidateQueries({ queryKey: ["tasks_by_card_id", card_id] }),
         onError: () => {
             toast.error("Something went wrong");
         },
@@ -104,12 +105,12 @@ export const useDragAndDropMoveTask = () => {
                 id: string, board_id: string, sourceCardId: string,
                 destinationCardId: string, prevIndex: number, newIndex: number
             }) => dragAndDropMoveTask(id, board_id, sourceCardId, destinationCardId, prevIndex, newIndex),
-        
+
         onMutate: async (variables) => {
             const { sourceCardId, destinationCardId } = variables;
 
             await queryClient.cancelQueries({ queryKey: ['tasks_by_card_id'] });
-            
+
             const previousSourceTasks = queryClient.getQueryData(['tasks_by_card_id', sourceCardId]);
             const previousDestTasks = queryClient.getQueryData(['tasks_by_card_id', destinationCardId]);
 
@@ -119,7 +120,7 @@ export const useDragAndDropMoveTask = () => {
             console.log('Task moved successfully');
         },
 
-        onError: (error, _, context) => { 
+        onError: (error, _, context) => {
             console.error('Error moving task:', error);
             toast.error("Something went wrong");
 
