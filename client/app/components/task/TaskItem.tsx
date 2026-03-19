@@ -1,5 +1,5 @@
 import { useUpdateTask } from '@/hooks/useTasks';
-import { socket } from '@/lib/socket';
+
 import { Task } from '@/types/Task'
 import { useParams } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
@@ -30,14 +30,7 @@ function TaskItem({ item }: TaskItemProps) {
         description: item.description || "", status: newStatus,
         card_id: item.card_id, board_id: board_id as string
       }, {
-      onSuccess: () => {
-        socket.emit("update_task", {
-          boardId: board_id,
-          cardId: item.card_id,
-          taskId: item.id,
-          status: newStatus
-        });
-      },
+
       onError: () => {
         queryClient.setQueryData<Task[]>(['tasks_by_card_id', item.card_id], (old) =>
           old?.map((t) => t.id === item.id ? { ...t, status: item.status } : t) ?? old

@@ -1,6 +1,7 @@
 import instance from "@/lib/axios"
 import { Attachment } from "@/types/GithubRepo";
 import { Task, TaskWithAssignedMember } from "@/types/Task";
+import { socket } from '@/lib/socket';
 
 export const getTasksByCardId = async (card_id: string, board_id: string): Promise<Task[]> => {
     const { data } = await instance.get(`/boards/${board_id}/cards/${card_id}/tasks`)
@@ -8,7 +9,11 @@ export const getTasksByCardId = async (card_id: string, board_id: string): Promi
 }
 
 export const createTaskWithInCard = async (name: string, description: string, card_id: string, board_id: string) => {
-    const { data } = await instance.post(`/boards/${board_id}/cards/${card_id}/tasks`, { name, description })
+    const { data } = await instance.post(`/boards/${board_id}/cards/${card_id}/tasks`, { name, description }, {
+        headers: {
+            'x-socket-id': socket.id
+        }
+    })
     return data;
 }
 
@@ -19,13 +24,21 @@ export const getTaskById = async (id: string, card_id: string, board_id: string)
 }
 
 export const updateTask = async (id: string, name: string, description: string, status: string, card_id: string, board_id: string) => {
-    const { data } = await instance.put(`/boards/${board_id}/cards/${card_id}/tasks/${id}`, { name, description, status });
+    const { data } = await instance.put(`/boards/${board_id}/cards/${card_id}/tasks/${id}`, { name, description, status }, {
+        headers: {
+            'x-socket-id': socket.id
+        }
+    });
 
     return data;
 }
 
 export const deleteTask = async (id: string, card_id: string, board_id: string) => {
-    const { data } = await instance.delete(`/boards/${board_id}/cards/${card_id}/tasks/${id}`);
+    const { data } = await instance.delete(`/boards/${board_id}/cards/${card_id}/tasks/${id}`, {
+        headers: {
+            'x-socket-id': socket.id
+        }
+    });
 
     return data;
 }
@@ -48,8 +61,12 @@ export const unassignMemberFromTask = async (id: string, card_id: string, board_
     return data;
 }
 
-export const dragAndDropMoveTask = async (id: string, sourceCardId: string, destinationCardId: string, newIndex: number) => {
-    const { data } = await instance.put(`/boards/tasks/${id}/move`, { sourceCardId, destinationCardId, newIndex });
+export const dragAndDropMoveTask = async (id: string, board_id: string, sourceCardId: string, destinationCardId: string, prevIndex: number, newIndex: number) => {
+    const { data } = await instance.put(`/boards/tasks/${id}/move`, { boardId: board_id, sourceCardId, destinationCardId, prevIndex, newIndex }, {
+        headers: {
+            'x-socket-id': socket.id
+        }
+    });
     return data;
 }
 

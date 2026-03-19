@@ -9,7 +9,6 @@ import TaskItem from '../task/TaskItem'
 import { Task, TaskWithAssignedMember } from '@/types/Task'
 import TaskDetailModal from '../task/TaskDetailModal'
 import { Draggable, Droppable } from '@hello-pangea/dnd'
-import { socket } from '@/lib/socket'
 import toast from 'react-hot-toast'
 import { useQueryClient } from '@tanstack/react-query'
 
@@ -33,21 +32,6 @@ function CardContainer({ name, card_id }: CardContainerProps) {
 
     const listActionRef = useRef<HTMLDivElement>(null);
     const queryClient = useQueryClient();
-
-    useEffect(() => {
-        socket.connect();
-
-        socket.on("task_move", ({ taskId, sourceCardId, destCardId, prevIndex, newIndex }) => {
-            console.log(taskId, sourceCardId, destCardId, prevIndex, newIndex);
-            queryClient.setQueryData(['tasks_by_card_id', card_id], (oldTasks: Task[]) => {
-                if (!oldTasks) return oldTasks;
-
-                return oldTasks.map(task =>
-                    task.id === taskId ? { ...task, status: status } : task
-                );
-            });
-        });
-    }, []);
 
     useEffect(() => {
         const handleOutsideClick = (event: MouseEvent) => {
@@ -88,7 +72,6 @@ function CardContainer({ name, card_id }: CardContainerProps) {
         editCard.mutate({ id: card_id, board_id: id as string, name, description }, {
             onSuccess: () => {
                 setIsEditingCard(false);
-                socket.emit("update_card_name_desc", { boardId: id as string, cardId: card_id, name, description })
             },
             onError: () => {
                 toast.error('Failed to edit card');

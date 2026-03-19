@@ -10,7 +10,7 @@ import AddMemberModal from './AddMemberModal';
 import { useAttachFromGithub, useDeleteAttachment, useDeleteTask, useGetAssignedMemberFromTask, useGetAttachmentsByTaskId, useUpdateTask } from '@/hooks/useTasks';
 import ListRepoModal from '../repository/ListRepoModal';
 import { getRepositoryById } from '@/services/githubRepo';
-import { socket } from '@/lib/socket';
+
 import ListAttachmentsModal from '../repository/ListAttachmentsModal';
 import AttachmentCard from '../repository/AttachmentCard';
 import { Attachment } from '@/types/GithubRepo';
@@ -57,7 +57,7 @@ export default function TaskDetailModal({ isOpen, cardName, cardId, task, onClos
 
         deleteTask.mutate({ id: task.id, board_id: id as string, card_id: cardId }, {
             onSuccess: () => {
-                socket.emit("update_task", { boardId: id as string, cardId: cardId })
+
                 toast.success('Task deleted successfully');
                 onClose();
             },
@@ -105,7 +105,7 @@ export default function TaskDetailModal({ isOpen, cardName, cardId, task, onClos
         }, {
             onSuccess: () => {
                 toast.success("Task updated successfully");
-                socket.emit("update_task_name_desc", { boardId: id as string, cardId: cardId, taskId: task.id, name, description})
+
             }
         })
     }

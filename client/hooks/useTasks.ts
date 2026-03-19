@@ -41,8 +41,6 @@ export const useUpdateTask = () => {
                 description: string, status: string,
                 card_id: string, board_id: string
             }) => updateTask(id, name, description, status, card_id, board_id),
-        // We handle optimistic updates manually at the component level (TaskItem, TaskDetailModal)
-        // and broadcast changes via websockets, so we avoid extra refetches here to keep UI snappy.
         onError: () => {
             toast.error("Something went wrong");
         },
@@ -101,11 +99,11 @@ export const useDragAndDropMoveTask = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ id, sourceCardId, destinationCardId, newIndex }:
+        mutationFn: ({ id, board_id, sourceCardId, destinationCardId, prevIndex, newIndex }:
             {
-                id: string, sourceCardId: string,
-                destinationCardId: string, newIndex: number
-            }) => dragAndDropMoveTask(id, sourceCardId, destinationCardId, newIndex),
+                id: string, board_id: string, sourceCardId: string,
+                destinationCardId: string, prevIndex: number, newIndex: number
+            }) => dragAndDropMoveTask(id, board_id, sourceCardId, destinationCardId, prevIndex, newIndex),
         
         onMutate: async (variables) => {
             const { sourceCardId, destinationCardId } = variables;
@@ -132,10 +130,7 @@ export const useDragAndDropMoveTask = () => {
                 }
                 toast.error("Failed to move task. Reverting changes.");
             }
-        },
-        onSettled: () => {
-            queryClient.invalidateQueries({ queryKey: ['tasks_by_card_id'] });
-        },
+        }
     })
 }
 

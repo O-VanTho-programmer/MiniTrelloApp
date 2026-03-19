@@ -112,9 +112,27 @@ function BoardPage() {
         })
 
 
+        socket.on("create_task", (newTask) => {
+            queryClient.setQueryData(['tasks_by_card_id', newTask.card_id], (oldTasks: Task[]) => {
+                if (!oldTasks) return [newTask];
+                if (oldTasks.some(t => t.id === newTask.id)) return oldTasks;
+                return [...oldTasks, newTask];
+            });
+        });
+
+        socket.on("create_card", (newCard) => {
+            queryClient.setQueryData(['cards_by_board_id', id as string], (oldCards: any[]) => {
+                if (!oldCards) return [newCard];
+                if (oldCards.some(c => c.id === newCard.id)) return oldCards;
+                return [...oldCards, newCard];
+            });
+        });
+
         return () => {
             socket.emit('leave_board', id as string);
             socket.off('task_move');
+            socket.off('create_task');
+            socket.off('create_card');
             socket.off('update_task');
             socket.off('update_task_name_desc');
             socket.off('update_card_name_desc');
@@ -220,7 +238,7 @@ function BoardPage() {
             queryClient.setQueryData(['tasks_by_card_id', destinationCardId], newTasksInDesCard);
         }
 
-        moveTask.mutate({ id: taskId, sourceCardId, destinationCardId, newIndex: newIndexOfTask });        
+        moveTask.mutate({ id: taskId, board_id: id as string, sourceCardId, destinationCardId, prevIndex: prevIndexOfTask, newIndex: newIndexOfTask });        
     }
     if (isLoadingCards) {
         return;

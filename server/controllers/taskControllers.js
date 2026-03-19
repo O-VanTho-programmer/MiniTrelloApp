@@ -22,6 +22,18 @@ exports.createTaskWithInCard = async (req, res) => {
         console.log(name, description, cardId, boardId, userId);
 
         const task = await Task.createWithInCard(cardId, boardId, userId, name, description);
+
+        const socketId = req.headers['x-socket-id'];
+        const io = req.app.get('io');
+        
+        if (io && boardId) {
+            if (socketId) {
+                io.to(boardId).except(socketId).emit("create_task", task);
+            } else {
+                io.to(boardId).emit("create_task", task);
+            }
+        }
+
         res.status(201).json(task);
     } catch (error) {
         console.error("Error create task with in card", error);
@@ -47,7 +59,23 @@ exports.updateTaskWithInCard = async (req, res) => {
         const { name, description, status } = req.body;
         const userId = req.user.id;
 
+        const boardId = req.params.boardId;
+        const cardId = req.params.id;
+
         const task = await Task.updateWithInCard(taskId, { name, description, status }, userId);
+
+        const socketId = req.headers['x-socket-id'];
+        const io = req.app.get('io');
+        
+        if (io && boardId) {
+            if (socketId) {
+                io.to(boardId).except(socketId).emit("update_task", { cardId, taskId, status });
+                io.to(boardId).except(socketId).emit("update_task_name_desc", { cardId, taskId, name, description });
+            } else {
+                io.to(boardId).emit("update_task", { cardId, taskId, status });
+                io.to(boardId).emit("update_task_name_desc", { cardId, taskId, name, description });
+            }
+        }
 
         res.status(200).json(task);
     } catch (error) {
@@ -61,7 +89,21 @@ exports.deleteTaskWithInCard = async (req, res) => {
         const taskId = req.params.taskId;
         const userId = req.user.id;
 
+        const boardId = req.params.boardId;
+        const cardId = req.params.id;
+
         await Task.deleteWithInCard(taskId, userId);
+
+        const socketId = req.headers['x-socket-id'];
+        const io = req.app.get('io');
+        
+        if (io && boardId) {
+            if (socketId) {
+                io.to(boardId).except(socketId).emit("update_task", { cardId });
+            } else {
+                io.to(boardId).emit("update_task", { cardId });
+            }
+        }
 
         res.status(204).json();
     } catch (error) {
@@ -123,10 +165,25 @@ exports.getAssignedMembersOfTaskWithInCard = async (req, res) => {
 exports.dragAndDropMove = async (req, res) => {
     try {
         const taskId = req.params.taskId;
-        const { sourceCardId, destinationCardId, newIndex } = req.body;
+        const { boardId, sourceCardId, destinationCardId, prevIndex, newIndex } = req.body;
         const userId = req.user.id;
         const task = await Task.dragAndDropMove(taskId, sourceCardId, destinationCardId, newIndex, userId);
-        io.emit("task_move", { taskId, sourceCardId, destinationCardId, newIndex });
+        
+        const socketId = req.headers['x-socket-id'];
+        const io = req.app.get('io');
+        
+        const payload = { taskId, sourceCardId, destCardId: destinationCardId, prevIndex, newIndex };
+
+        if (io && boardId) {
+            if (socketId) {
+                io.to(boardId).except(socketId).emit("task_move", payload);
+            } else {
+                io.to(boardId).emit("task_move", payload);
+            }
+        } else if (io) {
+            io.emit("task_move", payload);
+        }
+
         res.status(200).json(task);
     } catch (error) {
         console.error("Error drag and drop move", error);

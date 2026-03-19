@@ -10,7 +10,7 @@ const redisWriteBackService = require('./services/redisWriteBackService');
 const corsOptions = {
     origin: `${process.env.CLIENT_URL || 'http://localhost:3000'}`,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "x-socket-id"],
     credentials: true,
 };
 
@@ -27,6 +27,7 @@ const subClient = redisClient.duplicate();
 
 app.use(cors(corsOptions));
 app.use(express.json());
+app.set('io', io);
 
 // API Routes
 app.use('/auth', require('./routes/auth'));
@@ -61,24 +62,6 @@ async function startServer() {
             socket.on('leave_board', (boardId) => {
                 socket.leave(boardId);
                 console.log(`User ${socket.id} left board ${boardId}`);
-            })
-
-            socket.on('task_move', ({ boardId, taskId, sourceCardId, destCardId, prevIndex, newIndex }) => {
-                socket.to(boardId).emit('task_move', { taskId, sourceCardId, destCardId, prevIndex, newIndex });
-                console.log(`User ${socket.id} move task in board ${boardId}`);
-            })
-
-            socket.on('update_task', ({ boardId, cardId, taskId, status }) => {
-                socket.to(boardId).emit("update_task", { cardId, taskId, status });
-                console.log(`User ${socket.id} update task in board ${boardId}`);
-            })
-
-            socket.on('update_task_name_desc', ({ boardId, cardId, taskId, name, description }) => {
-                socket.to(boardId).emit("update_task_name_desc", { cardId, taskId, name, description });
-            })
-
-            socket.on('update_card_name_desc', ({ boardId, cardId, name, description }) => {
-                socket.to(boardId).emit("update_card_name_desc", { cardId, name, description });
             })
         });
 

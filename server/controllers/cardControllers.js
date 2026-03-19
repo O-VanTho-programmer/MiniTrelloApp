@@ -8,6 +8,17 @@ exports.newCard = async (req, res) => {
 
         const newCard = await Card.create(name, description, board_id, userId);
 
+        const socketId = req.headers['x-socket-id'];
+        const io = req.app.get('io');
+        
+        if (io && board_id) {
+            if (socketId) {
+                io.to(board_id).except(socketId).emit("create_card", newCard);
+            } else {
+                io.to(boardId).emit("create_card", newCard);
+            }
+        }
+
         res.status(201).json(newCard);
     } catch (error) {
         console.error("Error creating card", error);
@@ -42,12 +53,30 @@ exports.getCardsByUser = async (req, res) => {
 }
 
 exports.updateCard = async (req, res) => {
-    const cardId = req.params.id;
-    const { name, description } = req.body;
-    const userId = req.user.id;
+    try {
+        const cardId = req.params.id;
+        const boardId = req.params.boardId;
+        const { name, description } = req.body;
+        const userId = req.user.id;
 
-    const card = await Card.update(cardId, { name, description }, userId);
-    res.status(200).json(card);
+        const card = await Card.update(cardId, { name, description }, userId);
+
+        const socketId = req.headers['x-socket-id'];
+        const io = req.app.get('io');
+        
+        if (io && boardId) {
+            if (socketId) {
+                io.to(boardId).except(socketId).emit("update_card_name_desc", { cardId, name, description });
+            } else {
+                io.to(boardId).emit("update_card_name_desc", { cardId, name, description });
+            }
+        }
+
+        res.status(200).json(card);
+    } catch(err) {
+        console.error("Error updating card", err);
+        res.status(500).json({ error: "Error updating card" });
+    }
 }
 
 exports.deleteCard = async (req, res) => {
